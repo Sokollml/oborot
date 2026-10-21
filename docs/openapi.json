@@ -1121,6 +1121,366 @@
           }
         }
       }
+    },
+    "/api/applications/{application_id}/documents": {
+      "post": {
+        "tags": [
+          "Документы"
+        ],
+        "summary": "Загрузить документ по запросу банка",
+        "operationId": "upload_document_api_applications__application_id__documents_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_document_api_applications__application_id__documents_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyst/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "Документы",
+          "Кабинет специалиста"
+        ],
+        "summary": "Скачать документ клиента",
+        "operationId": "download_document_api_analyst_documents__document_id__get",
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Document Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyst/queue": {
+      "get": {
+        "tags": [
+          "Кабинет специалиста"
+        ],
+        "summary": "Очередь заявок",
+        "operationId": "queue_api_analyst_queue_get",
+        "parameters": [
+          {
+            "name": "view",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mine",
+                "active",
+                "all"
+              ],
+              "type": "string",
+              "description": "mine — ждут меня, active — в работе, all — все",
+              "default": "mine",
+              "title": "View"
+            },
+            "description": "mine — ждут меня, active — в работе, all — все"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AppStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по статусу (важнее, чем view)",
+              "title": "Status"
+            },
+            "description": "Фильтр по статусу (важнее, чем view)"
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по коду продукта",
+              "examples": [
+                "EXPRESS"
+              ],
+              "title": "Product"
+            },
+            "description": "Фильтр по коду продукта"
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QueueItem"
+                  },
+                  "title": "Response Queue Api Analyst Queue Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyst/applications/{application_id}": {
+      "get": {
+        "tags": [
+          "Кабинет специалиста"
+        ],
+        "summary": "Карточка заявки",
+        "operationId": "get_card_api_analyst_applications__application_id__get",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalystApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyst/applications/{application_id}/decision": {
+      "post": {
+        "tags": [
+          "Кабинет специалиста"
+        ],
+        "summary": "Решение специалиста",
+        "operationId": "decide_api_analyst_applications__application_id__decision_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalystDecisionIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalystApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1133,6 +1493,170 @@
           "system"
         ],
         "title": "ActorType"
+      },
+      "AnalystApplicationOut": {
+        "properties": {
+          "application": {
+            "$ref": "#/components/schemas/ApplicationOut"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/CheckOut"
+            },
+            "type": "array",
+            "title": "Checks"
+          },
+          "scoring": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoringOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recommendation": {
+            "$ref": "#/components/schemas/RecommendationOut"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryItem"
+            },
+            "type": "array",
+            "title": "History"
+          },
+          "decisions": {
+            "items": {
+              "$ref": "#/components/schemas/DecisionOut"
+            },
+            "type": "array",
+            "title": "Decisions",
+            "description": "Все решения по заявке, новые сверху"
+          },
+          "available_actions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Available Actions",
+            "description": "Что специалист может сделать сейчас: approve, request_docs, reject"
+          }
+        },
+        "type": "object",
+        "required": [
+          "application",
+          "checks",
+          "scoring",
+          "recommendation",
+          "history",
+          "decisions",
+          "available_actions"
+        ],
+        "title": "AnalystApplicationOut"
+      },
+      "AnalystDecisionIn": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "request_docs",
+              "reject"
+            ],
+            "title": "Action",
+            "description": "approve — одобрить (в т.ч. с изменёнными условиями), request_docs — запросить документы, reject — отказать"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "description": "Для approve: сумма",
+            "examples": [
+              2000000
+            ]
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months",
+            "description": "Для approve: срок, мес.",
+            "examples": [
+              12
+            ]
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate",
+            "description": "Для approve: ставка, % годовых",
+            "examples": [
+              24.0
+            ]
+          },
+          "doc_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Doc Types",
+            "description": "Для request_docs: какие документы нужны",
+            "examples": [
+              [
+                "bank_statement"
+              ]
+            ]
+          },
+          "client_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Reason",
+            "description": "Для reject: причина, которую увидит клиент"
+          },
+          "comment": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Comment",
+            "description": "Комментарий специалиста — обязателен",
+            "examples": [
+              "Выручка подтверждена выпиской"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "comment"
+        ],
+        "title": "AnalystDecisionIn"
       },
       "AppStatus": {
         "type": "string",
@@ -1615,6 +2139,110 @@
         "title": "ApplicationPatch",
         "description": "Частичное обновление черновика: передавайте только изменённые поля."
       },
+      "Body_upload_document_api_applications__application_id__documents_post": {
+        "properties": {
+          "document_request_id": {
+            "type": "integer",
+            "title": "Document Request Id",
+            "description": "Какой из запрошенных документов загружаем"
+          },
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "description": "PDF, JPG или PNG до 10 МБ"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document_request_id",
+          "file"
+        ],
+        "title": "Body_upload_document_api_applications__application_id__documents_post"
+      },
+      "CheckLine": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label",
+            "examples": [
+              "Налоговый долг"
+            ]
+          },
+          "value": {
+            "type": "string",
+            "title": "Value",
+            "examples": [
+              "нет"
+            ]
+          },
+          "level": {
+            "type": "string",
+            "title": "Level",
+            "description": "ok — хорошо, warn — обратить внимание, bad — плохо",
+            "examples": [
+              "ok"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "value",
+          "level"
+        ],
+        "title": "CheckLine"
+      },
+      "CheckOut": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "examples": [
+              "bki"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "examples": [
+              "Кредитная история (БКИ)"
+            ]
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok",
+            "description": "Сервис ответил"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level",
+            "description": "Итог проверки: ok / warn / bad"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/CheckLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fetched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "title",
+          "ok",
+          "level",
+          "lines",
+          "fetched_at"
+        ],
+        "title": "CheckOut"
+      },
       "CompanyLookupOut": {
         "properties": {
           "inn": {
@@ -1865,6 +2493,39 @@
           "status"
         ],
         "title": "DocumentRequestOut"
+      },
+      "FactorOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "value",
+          "points",
+          "comment"
+        ],
+        "title": "FactorOut"
       },
       "HTTPValidationError": {
         "properties": {
@@ -2248,6 +2909,104 @@
         ],
         "title": "Purpose"
       },
+      "QueueItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "company_inn": {
+            "type": "string",
+            "title": "Company Inn"
+          },
+          "product_code": {
+            "type": "string",
+            "title": "Product Code"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AppStatus"
+          },
+          "status_label": {
+            "type": "string",
+            "title": "Status Label"
+          },
+          "risk_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Risk Class",
+            "description": "Класс риска A–D (нет, если скоринг не проводился)"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          },
+          "waiting_since": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Waiting Since",
+            "description": "Когда заявка попала в текущий статус"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_name",
+          "company_inn",
+          "product_code",
+          "product_name",
+          "amount",
+          "term_months",
+          "status",
+          "status_label",
+          "risk_class",
+          "total_score",
+          "waiting_since"
+        ],
+        "title": "QueueItem"
+      },
       "RecommendIn": {
         "properties": {
           "purpose": {
@@ -2305,6 +3064,77 @@
         ],
         "title": "RecommendOut"
       },
+      "RecommendationOut": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "title": "Action",
+            "description": "approve | counter | request_docs | reject"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "examples": [
+              "Одобрить на запрошенных условиях"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate"
+          },
+          "monthly_payment": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Payment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "title",
+          "text"
+        ],
+        "title": "RecommendationOut"
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -2312,6 +3142,57 @@
           "analyst"
         ],
         "title": "Role"
+      },
+      "ScoringOut": {
+        "properties": {
+          "total_score": {
+            "type": "integer",
+            "title": "Total Score"
+          },
+          "risk_class": {
+            "type": "string",
+            "title": "Risk Class"
+          },
+          "base_score": {
+            "type": "integer",
+            "title": "Base Score",
+            "description": "Стартовый балл, от которого считаются факторы"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/FactorOut"
+            },
+            "type": "array",
+            "title": "Factors"
+          },
+          "stop_factors": {
+            "items": {
+              "$ref": "#/components/schemas/FactorOut"
+            },
+            "type": "array",
+            "title": "Stop Factors"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_score",
+          "risk_class",
+          "base_score",
+          "factors",
+          "stop_factors",
+          "model_version",
+          "created_at"
+        ],
+        "title": "ScoringOut"
       },
       "SignIn": {
         "properties": {

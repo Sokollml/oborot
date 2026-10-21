@@ -373,6 +373,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/applications/{application_id}/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Загрузить документ по запросу банка */
+        post: operations["upload_document_api_applications__application_id__documents_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/analyst/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Скачать документ клиента */
+        get: operations["download_document_api_analyst_documents__document_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/analyst/queue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Очередь заявок */
+        get: operations["queue_api_analyst_queue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/analyst/applications/{application_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Карточка заявки */
+        get: operations["get_card_api_analyst_applications__application_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/analyst/applications/{application_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Решение специалиста */
+        post: operations["decide_api_analyst_applications__application_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -382,6 +467,72 @@ export interface components {
          * @enum {string}
          */
         ActorType: "client" | "analyst" | "system";
+        /** AnalystApplicationOut */
+        AnalystApplicationOut: {
+            application: components["schemas"]["ApplicationOut"];
+            /** Checks */
+            checks: components["schemas"]["CheckOut"][];
+            scoring: components["schemas"]["ScoringOut"] | null;
+            recommendation: components["schemas"]["RecommendationOut"];
+            /** History */
+            history: components["schemas"]["HistoryItem"][];
+            /**
+             * Decisions
+             * @description Все решения по заявке, новые сверху
+             */
+            decisions: components["schemas"]["DecisionOut"][];
+            /**
+             * Available Actions
+             * @description Что специалист может сделать сейчас: approve, request_docs, reject
+             */
+            available_actions: string[];
+        };
+        /** AnalystDecisionIn */
+        AnalystDecisionIn: {
+            /**
+             * Action
+             * @description approve — одобрить (в т.ч. с изменёнными условиями), request_docs — запросить документы, reject — отказать
+             * @enum {string}
+             */
+            action: "approve" | "request_docs" | "reject";
+            /**
+             * Amount
+             * @description Для approve: сумма
+             * @example 2000000
+             */
+            amount?: number | null;
+            /**
+             * Term Months
+             * @description Для approve: срок, мес.
+             * @example 12
+             */
+            term_months?: number | null;
+            /**
+             * Rate
+             * @description Для approve: ставка, % годовых
+             * @example 24
+             */
+            rate?: number | null;
+            /**
+             * Doc Types
+             * @description Для request_docs: какие документы нужны
+             * @example [
+             *       "bank_statement"
+             *     ]
+             */
+            doc_types?: string[];
+            /**
+             * Client Reason
+             * @description Для reject: причина, которую увидит клиент
+             */
+            client_reason?: string | null;
+            /**
+             * Comment
+             * @description Комментарий специалиста — обязателен
+             * @example Выручка подтверждена выпиской
+             */
+            comment: string;
+        };
         /**
          * AppStatus
          * @enum {string}
@@ -556,6 +707,68 @@ export interface components {
              */
             bki_consent?: boolean | null;
         };
+        /** Body_upload_document_api_applications__application_id__documents_post */
+        Body_upload_document_api_applications__application_id__documents_post: {
+            /**
+             * Document Request Id
+             * @description Какой из запрошенных документов загружаем
+             */
+            document_request_id: number;
+            /**
+             * File
+             * @description PDF, JPG или PNG до 10 МБ
+             */
+            file: string;
+        };
+        /** CheckLine */
+        CheckLine: {
+            /**
+             * Label
+             * @example Налоговый долг
+             */
+            label: string;
+            /**
+             * Value
+             * @example нет
+             */
+            value: string;
+            /**
+             * Level
+             * @description ok — хорошо, warn — обратить внимание, bad — плохо
+             * @example ok
+             */
+            level: string;
+        };
+        /** CheckOut */
+        CheckOut: {
+            /**
+             * Source
+             * @example bki
+             */
+            source: string;
+            /**
+             * Title
+             * @example Кредитная история (БКИ)
+             */
+            title: string;
+            /**
+             * Ok
+             * @description Сервис ответил
+             */
+            ok: boolean;
+            /**
+             * Level
+             * @description Итог проверки: ok / warn / bad
+             */
+            level: string;
+            /** Lines */
+            lines: components["schemas"]["CheckLine"][];
+            /**
+             * Fetched At
+             * Format: date-time
+             */
+            fetched_at: string;
+        };
         /** CompanyLookupOut */
         CompanyLookupOut: {
             /**
@@ -676,6 +889,19 @@ export interface components {
             status: string;
             /** File Name */
             file_name?: string | null;
+        };
+        /** FactorOut */
+        FactorOut: {
+            /** Code */
+            code: string;
+            /** Title */
+            title: string;
+            /** Value */
+            value: string;
+            /** Points */
+            points: number;
+            /** Comment */
+            comment: string;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -865,6 +1091,39 @@ export interface components {
          * @enum {string}
          */
         Purpose: "stock_salary" | "equipment" | "urgent";
+        /** QueueItem */
+        QueueItem: {
+            /** Id */
+            id: number;
+            /** Company Name */
+            company_name: string;
+            /** Company Inn */
+            company_inn: string;
+            /** Product Code */
+            product_code: string;
+            /** Product Name */
+            product_name: string;
+            /** Amount */
+            amount: number | null;
+            /** Term Months */
+            term_months: number | null;
+            status: components["schemas"]["AppStatus"];
+            /** Status Label */
+            status_label: string;
+            /**
+             * Risk Class
+             * @description Класс риска A–D (нет, если скоринг не проводился)
+             */
+            risk_class: string | null;
+            /** Total Score */
+            total_score: number | null;
+            /**
+             * Waiting Since
+             * Format: date-time
+             * @description Когда заявка попала в текущий статус
+             */
+            waiting_since: string;
+        };
         /** RecommendIn */
         RecommendIn: {
             /**
@@ -891,11 +1150,57 @@ export interface components {
             /** Alternatives */
             alternatives: components["schemas"]["ProductOption"][];
         };
+        /** RecommendationOut */
+        RecommendationOut: {
+            /**
+             * Action
+             * @description approve | counter | request_docs | reject
+             */
+            action: string;
+            /**
+             * Title
+             * @example Одобрить на запрошенных условиях
+             */
+            title: string;
+            /** Text */
+            text: string;
+            /** Amount */
+            amount?: number | null;
+            /** Term Months */
+            term_months?: number | null;
+            /** Rate */
+            rate?: number | null;
+            /** Monthly Payment */
+            monthly_payment?: number | null;
+        };
         /**
          * Role
          * @enum {string}
          */
         Role: "client" | "analyst";
+        /** ScoringOut */
+        ScoringOut: {
+            /** Total Score */
+            total_score: number;
+            /** Risk Class */
+            risk_class: string;
+            /**
+             * Base Score
+             * @description Стартовый балл, от которого считаются факторы
+             */
+            base_score: number;
+            /** Factors */
+            factors: components["schemas"]["FactorOut"][];
+            /** Stop Factors */
+            stop_factors: components["schemas"]["FactorOut"][];
+            /** Model Version */
+            model_version: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** SignIn */
         SignIn: {
             /**
@@ -1630,6 +1935,184 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_document_api_applications__application_id__documents_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_document_api_applications__application_id__documents_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_document_api_analyst_documents__document_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    queue_api_analyst_queue_get: {
+        parameters: {
+            query?: {
+                /** @description mine — ждут меня, active — в работе, all — все */
+                view?: "mine" | "active" | "all";
+                /** @description Фильтр по статусу (важнее, чем view) */
+                status?: components["schemas"]["AppStatus"] | null;
+                /** @description Фильтр по коду продукта */
+                product?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QueueItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_card_api_analyst_applications__application_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalystApplicationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_api_analyst_applications__application_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnalystDecisionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnalystApplicationOut"];
+                };
             };
             /** @description Validation Error */
             422: {
