@@ -3,17 +3,21 @@ import { Badge, Button, Card, Group, SimpleGrid, Stack, Text, Title } from '@man
 import { IconArrowRight, IconPlus } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
-import { useMyApplications } from '../api/queries';
+import { useMyApplications, useMyCompanies } from '../api/queries';
 import type { ApplicationListItem } from '../api/types';
+import { PotentialSection } from '../components/PotentialSection';
 import { EmptyState, ErrorState, Loading } from '../components/StateViews';
 import { StatusBadge } from '../components/StatusBadge';
 import { ago, months, rub } from '../lib/format';
 
 export function HomePage() {
   const { data, isPending, error, refetch } = useMyApplications();
+  const { data: companies } = useMyCompanies();
 
   return (
     <Stack gap="lg">
+      {companies && companies.length > 0 && <PotentialSection companies={companies} />}
+
       <Group justify="space-between">
         <div>
           <Title order={2}>Мои заявки</Title>

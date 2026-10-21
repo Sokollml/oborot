@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
 import { useAnalystCard } from '../../api/queries';
+import { Chat } from '../../components/Chat';
 import { ErrorState, Loading } from '../../components/StateViews';
 import { StatusBadge } from '../../components/StatusBadge';
 import { months, rub } from '../../lib/format';
@@ -46,6 +47,7 @@ export function AnalystCardPage() {
             <ChecksSection checks={card.checks} />
             <ScoringSection scoring={card.scoring} />
             <DocumentsSection card={card} />
+            <Chat applicationId={app.id} role="analyst" title="Переписка с клиентом" placeholder="Ответ клиенту…" />
             <HistorySection card={card} />
           </Stack>
         </Grid.Col>

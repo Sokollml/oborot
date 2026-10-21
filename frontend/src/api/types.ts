@@ -26,3 +26,6 @@ export type ScoringOut = S['ScoringOut'];
 export type FactorOut = S['FactorOut'];
 export type Recommendation = S['RecommendationOut'];
 export type AnalystDecisionIn = S['AnalystDecisionIn'];
+export type MyCompany = S['MyCompanyOut'];
+export type Potential = S['PotentialOut'];
+export type Message = S['MessageOut'];

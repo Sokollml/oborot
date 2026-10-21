@@ -114,7 +114,7 @@ export function ChecksSection({ checks }: { checks: CheckOut[] }) {
           Проверки ещё не проводились.
         </Text>
       ) : (
-        <SimpleGrid cols={3} spacing="sm">
+        <SimpleGrid cols={2} spacing="sm">
           {checks.map((c) => (
             <CheckCard key={c.source} check={c} />
           ))}

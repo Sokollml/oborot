@@ -157,6 +157,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Мои компании и предодобренные лимиты */
+        get: operations["my_companies_api_companies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/companies/{company_id}/potential": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Рассчитать предодобренный лимит (без документов) */
+        post: operations["calculate_potential_api_companies__company_id__potential_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/applications": {
         parameters: {
             query?: never;
@@ -458,6 +492,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/applications/{application_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Переписка по заявке */
+        get: operations["client_messages_api_applications__application_id__messages_get"];
+        put?: never;
+        /** Написать специалисту */
+        post: operations["client_post_api_applications__application_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/analyst/applications/{application_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Переписка с клиентом */
+        get: operations["analyst_messages_api_analyst_applications__application_id__messages_get"];
+        put?: never;
+        /** Написать клиенту */
+        post: operations["analyst_post_api_analyst_applications__application_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -629,6 +699,11 @@ export interface components {
             collateral_description: string | null;
             /** Bki Consent */
             bki_consent: boolean;
+            /**
+             * Revenue Prefilled
+             * @description Выручка подставлена из оборотов по счёту в банке
+             */
+            revenue_prefilled: boolean;
             /** @description Последнее решение по заявке, если есть */
             decision: components["schemas"]["DecisionOut"] | null;
             /** Documents */
@@ -938,6 +1013,33 @@ export interface components {
              */
             password: string;
         };
+        /** MessageIn */
+        MessageIn: {
+            /**
+             * Text
+             * @example Выписку загрузил, нужен ли ещё отчёт?
+             */
+            text: string;
+        };
+        /** MessageOut */
+        MessageOut: {
+            /** Id */
+            id: number;
+            /**
+             * Author Role
+             * @description client — клиент, analyst — специалист
+             */
+            author_role: string;
+            /** Author Name */
+            author_name: string;
+            /** Text */
+            text: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** MetaOut */
         MetaOut: {
             /**
@@ -949,6 +1051,19 @@ export interface components {
             demo_accounts?: components["schemas"]["DemoAccount"][];
             /** Demo Password */
             demo_password?: string | null;
+        };
+        /** MyCompanyOut */
+        MyCompanyOut: {
+            /** Id */
+            id: number;
+            /** Inn */
+            inn: string;
+            /** Name */
+            name: string;
+            /** Status */
+            status: string;
+            /** @description Последний расчёт лимита; null — ещё не считали */
+            potential: components["schemas"]["PotentialOut"] | null;
         };
         /** NextActionOut */
         NextActionOut: {
@@ -1006,6 +1121,75 @@ export interface components {
              * @description Сколько непрочитанных — число на колокольчике
              */
             unread_count: number;
+        };
+        /** PotentialOffer */
+        PotentialOffer: {
+            /**
+             * Product Code
+             * @example EXPRESS
+             */
+            product_code: string;
+            /** Product Name */
+            product_name: string;
+            /**
+             * Amount
+             * @description Максимальная сумма с автоматическим одобрением, ₽
+             * @example 3000000
+             */
+            amount: number;
+            /** Term Months */
+            term_months: number;
+            /** Rate */
+            rate: number;
+            /** Monthly Payment */
+            monthly_payment: number;
+        };
+        /** PotentialOut */
+        PotentialOut: {
+            /**
+             * Status
+             * @description ok — есть предложение, none — нет, no_account — нет счёта в банке, unavailable — сервис не ответил
+             */
+            status: string;
+            /**
+             * Title
+             * @example Вам предварительно одобрено до 13 750 000 ₽
+             */
+            title: string;
+            /** Text */
+            text: string;
+            /** Max Amount */
+            max_amount?: number | null;
+            /** Offers */
+            offers?: components["schemas"]["PotentialOffer"][];
+            /**
+             * Revenue 12M
+             * @description Поступления на счёт за 12 месяцев
+             */
+            revenue_12m?: number | null;
+            /** Revenue Prev 12M */
+            revenue_prev_12m?: number | null;
+            /**
+             * Drivers
+             * @description Что помогло
+             */
+            drivers?: string[];
+            /**
+             * Tips
+             * @description Как увеличить лимит
+             */
+            tips?: string[];
+            /** Calculated At */
+            calculated_at?: string | null;
+        };
+        /** PotentialRequest */
+        PotentialRequest: {
+            /**
+             * Consent
+             * @description Согласие на запрос кредитной истории — без него лимит не считаем
+             * @example true
+             */
+            consent: boolean;
         };
         /** ProductOption */
         ProductOption: {
@@ -1469,6 +1653,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CompanyLookupOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_companies_api_companies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyCompanyOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calculate_potential_api_companies__company_id__potential_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                company_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PotentialRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyCompanyOut"];
                 };
             };
             /** @description Validation Error */
@@ -2112,6 +2364,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnalystApplicationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_messages_api_applications__application_id__messages_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_post_api_applications__application_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    analyst_messages_api_analyst_applications__application_id__messages_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    analyst_post_api_analyst_applications__application_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                application_id: number;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageOut"][];
                 };
             };
             /** @description Validation Error */

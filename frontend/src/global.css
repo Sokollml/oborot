@@ -80,3 +80,16 @@ h1, h2, h3, h4 {
   box-shadow: 0 8px 24px rgba(11, 31, 53, 0.08);
   transform: translateY(-1px);
 }
+
+/* Карточка с предодобренным лимитом — красная полоса сверху */
+.potential-ok {
+  box-shadow: inset 0 4px 0 var(--mantine-color-accent-6);
+}
+
+/* Тёмный баннер с предложением (графит + красное свечение) */
+.hero-dark {
+  background:
+    radial-gradient(600px 220px at 100% 0%, rgba(239, 49, 36, 0.45), transparent 70%),
+    #0b1f35 !important;
+  color: #ffffff;
+}

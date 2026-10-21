@@ -12,7 +12,9 @@ import type {
   AppStatus,
   CompanyLookup,
   HistoryItem,
+  Message,
   Meta,
+  MyCompany,
   NotificationsResponse,
   Product,
   Purpose,
@@ -247,4 +249,36 @@ export function useAnalystDecision(id: number) {
       qc.invalidateQueries({ queryKey: ['analyst-queue'] });
     },
   });
+}
+
+// ---------- Мои компании и предодобренный лимит ----------
+
+export function useMyCompanies() {
+  return useQuery({ queryKey: ['companies'], queryFn: () => api.get<MyCompany[]>('/companies') });
+}
+
+export function useCalculatePotential() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (companyId: number) => api.post<MyCompany>(`/companies/${companyId}/potential`, { consent: true }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['companies'] }),
+  });
+}
+
+// ---------- Переписка по заявке ----------
+
+/** role: 'client' — запросы клиента, 'analyst' — из кабинета специалиста. */
+export function useMessages(applicationId: number, role: 'client' | 'analyst') {
+  const base = role === 'analyst' ? `/analyst/applications/${applicationId}` : `/applications/${applicationId}`;
+  const qc = useQueryClient();
+  const list = useQuery({
+    queryKey: ['messages', role, applicationId],
+    queryFn: () => api.get<Message[]>(`${base}/messages`),
+    refetchInterval: 5000, // ответ собеседника появляется сам
+  });
+  const send = useMutation({
+    mutationFn: (text: string) => api.post<Message[]>(`${base}/messages`, { text }),
+    onSuccess: (messages) => qc.setQueryData(['messages', role, applicationId], messages),
+  });
+  return { list, send };
 }

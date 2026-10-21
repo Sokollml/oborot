@@ -8,6 +8,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
 import { useApplication, useHistory } from '../../api/queries';
 import type { Application } from '../../api/types';
+import { Chat } from '../../components/Chat';
 import { ErrorState, Loading } from '../../components/StateViews';
 import { StatusBadge } from '../../components/StatusBadge';
 import { dateTime, months, rub } from '../../lib/format';
@@ -55,7 +56,10 @@ export function ApplicationPage() {
           </Stack>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 7 }}>
-          <NextActionPanel app={app} />
+          <Stack gap="lg">
+            <NextActionPanel app={app} />
+            <Chat applicationId={app.id} role="client" title="Вопрос по заявке" placeholder="Напишите специалисту…" />
+          </Stack>
         </Grid.Col>
       </Grid>
     </Stack>

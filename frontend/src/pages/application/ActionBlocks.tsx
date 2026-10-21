@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { errorText } from '../../api/client';
 import { useAcceptOffer, useCloneApplication, useDeclineOffer, useSign, useUploadDocument } from '../../api/queries';
 import type { Application } from '../../api/types';
+import { LoanDetailsButtons, nextPaymentDate } from '../../components/LoanDetails';
 import { annuity, months, rate, rub } from '../../lib/format';
 import { Term } from '../../lib/glossary';
 
@@ -123,6 +124,8 @@ export function OfferBlock({ app }: { app: Application }) {
         </div>
       )}
 
+      <LoanDetailsButtons app={app} />
+
       {error && <Alert color="red">{errorText(error)}</Alert>}
       <Group>
         <ConfirmButton
@@ -201,25 +204,34 @@ export function SignBlock({ app }: { app: Application }) {
 // ---------- Деньги зачислены ----------
 
 export function DoneBlock({ app }: { app: Application }) {
+  const d = app.decision;
   return (
-    <Stack align="flex-start">
+    <Stack>
       <Group>
         <ThemeIcon size={48} radius="xl" color="green">
           <IconCircleCheck size={30} />
         </ThemeIcon>
         <div>
-          <Text size="xl" fw={700}>
-            {rub(app.decision?.amount)}
+          <Text size="xl" fw={800}>
+            {rub(d?.amount)}
           </Text>
           <Text c="dimmed">на расчётном счёте {app.company.name}</Text>
         </div>
       </Group>
-      <Text size="sm">
-        Платёж {rub(app.decision?.monthly_payment)} в месяц, {months(app.decision?.term)}. Первый платёж — примерно через месяц.
+      <SimpleGrid cols={3} spacing="sm">
+        <Big label="Ближайший платёж" value={nextPaymentDate(app.updated_at)} />
+        <Big label="Сумма платежа" value={rub(d?.monthly_payment)} accent />
+        <Big label="Остаток долга" value={rub(d?.amount)} />
+      </SimpleGrid>
+      <Text size="sm" c="dimmed">
+        Платёж спишется со счёта автоматически. Погасить досрочно можно в любой день без комиссии.
       </Text>
-      <Button component={Link} to="/" variant="light">
-        К моим заявкам
-      </Button>
+      <Group>
+        <LoanDetailsButtons app={app} start={new Date(app.updated_at)} />
+        <Button component={Link} to="/" variant="subtle">
+          К моим заявкам
+        </Button>
+      </Group>
     </Stack>
   );
 }

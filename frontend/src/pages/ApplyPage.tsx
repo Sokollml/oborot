@@ -90,11 +90,17 @@ function CompanyCard({ company }: { company: Pick<CompanyLookup, 'name' | 'inn' 
   );
 }
 
-function CompanyStep({ onConfirm, creating, createError }: { onConfirm: (inn: string) => void; creating: boolean; createError: unknown }) {
-  const [inn, setInn] = useState('');
+function CompanyStep({ onConfirm, creating, createError, initialInn }: { onConfirm: (inn: string) => void; creating: boolean; createError: unknown; initialInn?: string }) {
+  const [inn, setInn] = useState(initialInn ?? '');
   const [touched, setTouched] = useState(false);
   const lookup = useCompanyLookup();
   const localError = touched ? innError(inn) : null;
+
+  // Пришли из предодобренного предложения — компанию знаем, сразу показываем её карточку.
+  useEffect(() => {
+    if (initialInn && !innError(initialInn)) lookup.mutate(initialInn);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialInn]);
 
   const find = () => {
     setTouched(true);
@@ -149,7 +155,7 @@ function CompanyStep({ onConfirm, creating, createError }: { onConfirm: (inn: st
 const required = (msg: string) => z.number({ error: msg });
 
 const schema = z.object({
-  revenue_12m: required('Укажите выручку за последние 12 месяцев').min(1, 'Выручка должна быть больше нуля'),
+  revenue_12m: required('Укажите выручку за последние 12 месяцев').min(100_000, 'Похоже на опечатку: укажите выручку в рублях, не меньше 100 000 ₽'),
   revenue_prev_year: required('Укажите выручку за предыдущие 12 месяцев — если бизнесу меньше 2 лет, поставьте 0').min(0, 'Не может быть меньше нуля'),
   monthly_debt_payments: required('Укажите платежи по другим кредитам — если их нет, поставьте 0').min(0, 'Не может быть меньше нуля'),
   employees: required('Укажите число сотрудников').int('Целое число').min(0, 'Не может быть меньше нуля').max(100_000, 'Слишком много — проверьте'),
@@ -267,6 +273,7 @@ function NewApplication() {
           Шаг 1. Ваша компания
         </Title>
         <CompanyStep
+          initialInn={search.get('inn') ?? undefined}
           creating={create.isPending}
           createError={create.error}
           onConfirm={(inn) =>
@@ -397,9 +404,15 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
           {step === 1 && (
             <>
               <Title order={4}>Шаг 2. Финансы компании</Title>
-              <Text size="sm" c="dimmed">
-                Примерные цифры подойдут — точные мы сверим позже. Они нужны, чтобы предложить посильный платёж.
-              </Text>
+              {app.revenue_prefilled ? (
+                <Alert color="green" variant="light" icon={<IconCloudCheck size={18} />}>
+                  Выручку подставили по <Term k="turnover">оборотам на вашем счёте</Term> в банке — проверьте и при необходимости поправьте.
+                </Alert>
+              ) : (
+                <Text size="sm" c="dimmed">
+                  Примерные цифры подойдут — точные мы сверим позже. Они нужны, чтобы предложить посильный платёж.
+                </Text>
+              )}
               <SimpleGrid cols={{ base: 1, sm: 2 }}>
                 <MoneyField control={control} name="revenue_12m" label="Выручка за последние 12 месяцев" description="Все поступления от продаж, до вычета расходов" />
                 <MoneyField control={control} name="revenue_prev_year" label="Выручка за 12 месяцев до этого" description="Чтобы понять, растёт ли бизнес. Нет данных — поставьте 0" />
