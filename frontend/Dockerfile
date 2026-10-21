@@ -1,5 +1,6 @@
 # Этап 1: сборка React-приложения.
-FROM node:22-alpine AS build
+# Debian (slim), а не alpine: npm в alpine не ставит musl-сборки нативных пакетов (lightningcss, rolldown).
+FROM node:22-bookworm-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-fund --no-audit
