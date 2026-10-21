@@ -1,0 +1,85 @@
+# Правила скоринга и кредитного решения.
+# ВСЕ веса, пороги и надбавки живут только здесь — в коде их нет.
+# Поменяли цифры → поменяйте model_version, чтобы в базе было видно, по какой версии считали.
+#
+# Как читать полосы (bands): берётся первая полоса, где значение <= upto.
+# upto: null — «всё, что больше».
+
+model_version: "rules-2026.10-v1"
+
+base_score: 40
+min_score: 0
+max_score: 100
+
+# Стоп-факторы: при любом из них — сразу отказ, баллы не важны.
+stop_factors:
+  company_statuses: [liquidating, bankrupt]   # ликвидация или банкротство
+  min_business_age_months: 6                  # бизнесу меньше 6 месяцев
+  max_overdue_days: 89                        # просрочка 90+ дней за 2 года
+
+factors:
+  # Возраст бизнеса, полных месяцев
+  business_age_months:
+    - { upto: 11, points: 0 }     # 6–12 месяцев
+    - { upto: 36, points: 10 }    # 1–3 года
+    - { upto: null, points: 15 }  # больше 3 лет
+
+  # Сумма кредита / выручка за 12 месяцев, %
+  amount_to_revenue_pct:
+    - { upto: 20, points: 15 }
+    - { upto: 50, points: 5 }
+    - { upto: null, points: -15 }
+
+  # Долговая нагрузка: (текущие платежи + новый платёж) / (выручка за 12 мес / 12), %
+  debt_load_pct:
+    - { upto: 15, points: 15 }
+    - { upto: 30, points: 5 }
+    - { upto: null, points: -20 }
+
+  # Кредитная история (БКИ)
+  credit_history:
+    clean_closed_loans: 15      # есть закрытые кредиты, просрочек не было
+    no_history: 0               # закрытых кредитов нет
+    overdue_up_to_30: -10       # просрочка 1–30 дней
+    overdue_31_89: -25          # просрочка 31–89 дней
+
+  # Выручка год к году
+  revenue_trend:
+    growth: 5                   # выручка выросла
+    drop_over_pct: 30           # порог сильного падения, %
+    big_drop: -10               # выручка упала больше чем на 30%
+
+  tax_debt: -15                 # есть налоговый долг
+  mass_address: -5              # компания зарегистрирована на массовом адресе
+
+# Класс риска по итоговому баллу: первый класс, где score >= min_score
+risk_classes:
+  - { class: A, min_score: 70 }
+  - { class: B, min_score: 55 }
+  - { class: C, min_score: 40 }
+  - { class: D, min_score: 0 }
+
+# Кредитное решение по продукту и классу риска:
+# approve — автоодобрение, counter — контрпредложение, manual — к специалисту,
+# info — запросить выписку (потом к специалисту), reject — отказ
+decision_matrix:
+  EXPRESS: { A: approve, B: counter, C: reject, D: reject }
+  WORKING: { A: approve, B: manual,  C: info,   D: reject }
+  INVEST:  { A: manual,  B: manual,  C: manual, D: reject }
+
+# Ставка = базовая ставка продукта + надбавка по классу, п.п.
+rate_surcharge:
+  A: 0
+  B: 2
+  C: 4
+  D: 6
+
+# Контрпредложение: доля от запрошенной суммы, округление вниз
+counter_offer:
+  ratio: 0.7
+  round_to: 10000
+
+# Для советов клиенту: какую долю выручки и нагрузку считаем комфортной
+advice:
+  comfortable_amount_to_revenue_pct: 20
+  comfortable_debt_load_pct: 30
