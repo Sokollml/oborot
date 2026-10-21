@@ -492,6 +492,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/analyst/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Аналитика конвейера: скорость, доля автоматических решений, воронка */
+        get: operations["get_stats_api_analyst_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/applications/{application_id}/messages": {
         parameters: {
             query?: never;
@@ -1393,6 +1410,69 @@ export interface components {
              * @example 482915
              */
             code: string;
+        };
+        /** StatItem */
+        StatItem: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Count */
+            count: number;
+        };
+        /** StatsOut */
+        StatsOut: {
+            /**
+             * Submitted
+             * @description Отправлено заявок
+             */
+            submitted: number;
+            /**
+             * Decided
+             * @description Принято окончательных решений (одобрение / контрпредложение / отказ)
+             */
+            decided: number;
+            /**
+             * Auto Share
+             * @description Доля решений без участия специалиста, %
+             */
+            auto_share: number | null;
+            /** Auto Count */
+            auto_count: number;
+            /** Manual Count */
+            manual_count: number;
+            /**
+             * Median First Response Sec
+             * @description Медиана: от отправки до первого ответа клиенту, сек
+             */
+            median_first_response_sec: number | null;
+            /**
+             * Median Auto Decision Sec
+             * @description Медиана: от отправки до автоматического решения, сек
+             */
+            median_auto_decision_sec: number | null;
+            /**
+             * Median Manual Decision Sec
+             * @description Медиана: от отправки до решения специалиста, сек
+             */
+            median_manual_decision_sec: number | null;
+            /** Issued Count */
+            issued_count: number;
+            /**
+             * Issued Volume
+             * @description Выдано всего, ₽
+             */
+            issued_volume: number;
+            /** Average Issued */
+            average_issued: number | null;
+            /** Funnel */
+            funnel: components["schemas"]["StatItem"][];
+            /** Status Groups */
+            status_groups: components["schemas"]["StatItem"][];
+            /** Risk Classes */
+            risk_classes: components["schemas"]["StatItem"][];
+            /** Products */
+            products: components["schemas"]["StatItem"][];
         };
         /** UserOut */
         UserOut: {
@@ -2364,6 +2444,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnalystApplicationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_stats_api_analyst_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatsOut"];
                 };
             };
             /** @description Validation Error */

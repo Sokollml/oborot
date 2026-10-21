@@ -1603,6 +1603,55 @@
         }
       }
     },
+    "/api/analyst/stats": {
+      "get": {
+        "tags": [
+          "Кабинет специалиста"
+        ],
+        "summary": "Аналитика конвейера: скорость, доля автоматических решений, воронка",
+        "operationId": "get_stats_api_analyst_stats_get",
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/applications/{application_id}/messages": {
       "get": {
         "tags": [
@@ -3854,6 +3903,166 @@
           "code"
         ],
         "title": "SignIn"
+      },
+      "StatItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "count"
+        ],
+        "title": "StatItem"
+      },
+      "StatsOut": {
+        "properties": {
+          "submitted": {
+            "type": "integer",
+            "title": "Submitted",
+            "description": "Отправлено заявок"
+          },
+          "decided": {
+            "type": "integer",
+            "title": "Decided",
+            "description": "Принято окончательных решений (одобрение / контрпредложение / отказ)"
+          },
+          "auto_share": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Auto Share",
+            "description": "Доля решений без участия специалиста, %"
+          },
+          "auto_count": {
+            "type": "integer",
+            "title": "Auto Count"
+          },
+          "manual_count": {
+            "type": "integer",
+            "title": "Manual Count"
+          },
+          "median_first_response_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median First Response Sec",
+            "description": "Медиана: от отправки до первого ответа клиенту, сек"
+          },
+          "median_auto_decision_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Auto Decision Sec",
+            "description": "Медиана: от отправки до автоматического решения, сек"
+          },
+          "median_manual_decision_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Manual Decision Sec",
+            "description": "Медиана: от отправки до решения специалиста, сек"
+          },
+          "issued_count": {
+            "type": "integer",
+            "title": "Issued Count"
+          },
+          "issued_volume": {
+            "type": "integer",
+            "title": "Issued Volume",
+            "description": "Выдано всего, ₽"
+          },
+          "average_issued": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Average Issued"
+          },
+          "funnel": {
+            "items": {
+              "$ref": "#/components/schemas/StatItem"
+            },
+            "type": "array",
+            "title": "Funnel"
+          },
+          "status_groups": {
+            "items": {
+              "$ref": "#/components/schemas/StatItem"
+            },
+            "type": "array",
+            "title": "Status Groups"
+          },
+          "risk_classes": {
+            "items": {
+              "$ref": "#/components/schemas/StatItem"
+            },
+            "type": "array",
+            "title": "Risk Classes"
+          },
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/StatItem"
+            },
+            "type": "array",
+            "title": "Products"
+          }
+        },
+        "type": "object",
+        "required": [
+          "submitted",
+          "decided",
+          "auto_share",
+          "auto_count",
+          "manual_count",
+          "median_first_response_sec",
+          "median_auto_decision_sec",
+          "median_manual_decision_sec",
+          "issued_count",
+          "issued_volume",
+          "average_issued",
+          "funnel",
+          "status_groups",
+          "risk_classes",
+          "products"
+        ],
+        "title": "StatsOut"
       },
       "UserOut": {
         "properties": {

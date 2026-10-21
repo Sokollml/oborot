@@ -13,8 +13,8 @@ from app.deps import DB, AnalystUser
 from app.enums import AppStatus, DecisionMaker, DecisionType, DocStatus
 from app.errors import Conflict, NotFound, ValidationFailed
 from app.models import Application, Company, Decision, DocumentRequest, Product, Scoring, StatusHistory
-from app.schemas import AnalystApplicationOut, AnalystDecisionIn, DecisionOut, HistoryItem, QueueItem
-from app.services import analyst_view
+from app.schemas import AnalystApplicationOut, AnalystDecisionIn, DecisionOut, HistoryItem, QueueItem, StatsOut
+from app.services import analyst_view, stats
 from app.services.finance import annuity_payment
 from app.services.state_machine import STATUS_LABELS, Actor, transition
 from app.views import DOC_TITLES, application_out
@@ -172,3 +172,8 @@ def decide(application_id: int, body: AnalystDecisionIn, db: DB, user: AnalystUs
 
     db.commit()
     return _card(db, app)
+
+
+@router.get("/stats", response_model=StatsOut, summary="Аналитика конвейера: скорость, доля автоматических решений, воронка")
+def get_stats(db: DB, _user: AnalystUser) -> StatsOut:
+    return StatsOut(**stats.collect(db))

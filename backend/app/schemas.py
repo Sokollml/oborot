@@ -367,3 +367,30 @@ class MessageOut(ORM):
 
 class MessageIn(BaseModel):
     text: str = Field(min_length=1, max_length=2000, examples=["Выписку загрузил, нужен ли ещё отчёт?"])
+
+
+# ---------- Аналитика конвейера ----------
+
+
+class StatItem(BaseModel):
+    key: str
+    label: str
+    count: int
+
+
+class StatsOut(BaseModel):
+    submitted: int = Field(description="Отправлено заявок")
+    decided: int = Field(description="Принято окончательных решений (одобрение / контрпредложение / отказ)")
+    auto_share: int | None = Field(description="Доля решений без участия специалиста, %")
+    auto_count: int
+    manual_count: int
+    median_first_response_sec: int | None = Field(description="Медиана: от отправки до первого ответа клиенту, сек")
+    median_auto_decision_sec: int | None = Field(description="Медиана: от отправки до автоматического решения, сек")
+    median_manual_decision_sec: int | None = Field(description="Медиана: от отправки до решения специалиста, сек")
+    issued_count: int
+    issued_volume: int = Field(description="Выдано всего, ₽")
+    average_issued: int | None
+    funnel: list[StatItem]
+    status_groups: list[StatItem]
+    risk_classes: list[StatItem]
+    products: list[StatItem]
