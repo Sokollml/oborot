@@ -1,0 +1,18 @@
+meta {
+  name: Решение без комментария — 422
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/api/analyst/applications/{{appId}}/decision
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "action": "reject",
+    "comment": " "
+  }
+}

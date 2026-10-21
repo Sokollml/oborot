@@ -1,0 +1,21 @@
+meta {
+  name: Одобрить
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/analyst/applications/{{appId}}/decision
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "action": "approve",
+    "amount": 7000000,
+    "term_months": 24,
+    "rate": 24.0,
+    "comment": "Выписка подтверждает выручку, снижаем сумму"
+  }
+}

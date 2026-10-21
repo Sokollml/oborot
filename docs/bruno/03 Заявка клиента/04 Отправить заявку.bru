@@ -1,0 +1,27 @@
+meta {
+  name: Отправить заявку
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/applications/{{appId}}/submit
+  body: none
+  auth: none
+}
+
+headers {
+  Idempotency-Key: {{idemKey}}
+}
+
+script:pre-request {
+  // Один ключ на заявку: повтор запроса не создаст вторую отправку
+  if (bru.getVar("idemFor") !== String(bru.getVar("appId"))) {
+    bru.setVar("idemKey", "bruno-" + bru.getVar("appId") + "-" + Date.now());
+    bru.setVar("idemFor", String(bru.getVar("appId")));
+  }
+}
+
+docs {
+  Повторите запрос — второй отправки не будет: ключ тот же (идемпотентность), ответ — текущее состояние заявки.
+}

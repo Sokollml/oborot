@@ -1,0 +1,19 @@
+meta {
+  name: Статус заявки и что дальше
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/applications/{{appId}}
+  body: none
+  auth: none
+}
+
+script:post-response {
+  if (res.body.documents && res.body.documents.length) bru.setVar("docId", res.body.documents[res.body.documents.length - 1].id);
+}
+
+docs {
+  Этот запрос фронт делает раз в 3 секунды. Поле next_action — что показать клиенту.
+}

@@ -1,0 +1,25 @@
+meta {
+  name: Создать черновик (Ромашка)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/applications
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "product_code": "EXPRESS",
+    "inn": "0010000017",
+    "purpose": "urgent",
+    "amount": 2000000,
+    "term_months": 12
+  }
+}
+
+script:post-response {
+  if (res.status === 201) bru.setVar("appId", res.body.id);
+}

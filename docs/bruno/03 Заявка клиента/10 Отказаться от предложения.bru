@@ -1,0 +1,11 @@
+meta {
+  name: Отказаться от предложения
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/api/applications/{{appId}}/offer/decline
+  body: none
+  auth: none
+}

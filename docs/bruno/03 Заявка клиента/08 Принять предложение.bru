@@ -1,0 +1,15 @@
+meta {
+  name: Принять предложение
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{baseUrl}}/api/applications/{{appId}}/offer/accept
+  body: none
+  auth: none
+}
+
+script:post-response {
+  if (res.body.signing_code) bru.setVar("signingCode", res.body.signing_code);
+}

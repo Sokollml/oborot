@@ -1,0 +1,21 @@
+meta {
+  name: Заполнить анкету
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{baseUrl}}/api/applications/{{appId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "revenue_12m": 30000000,
+    "revenue_prev_year": 26000000,
+    "monthly_debt_payments": 50000,
+    "employees": 12,
+    "bki_consent": true
+  }
+}

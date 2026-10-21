@@ -1,0 +1,17 @@
+meta {
+  name: Подписать кодом
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/applications/{{appId}}/sign
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "code": "{{signingCode}}"
+  }
+}

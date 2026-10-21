@@ -1,0 +1,15 @@
+meta {
+  name: Подать заново с этими данными
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/api/applications/{{appId}}/clone
+  body: none
+  auth: none
+}
+
+script:post-response {
+  if (res.status === 201) bru.setVar("appId", res.body.id);
+}

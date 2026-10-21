@@ -1,0 +1,21 @@
+meta {
+  name: Запросить документы
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/api/analyst/applications/{{appId}}/decision
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "action": "request_docs",
+    "doc_types": [
+      "bank_statement"
+    ],
+    "comment": "Нужно подтвердить выручку"
+  }
+}

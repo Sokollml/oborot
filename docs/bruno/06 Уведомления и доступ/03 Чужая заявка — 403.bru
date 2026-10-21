@@ -1,0 +1,15 @@
+meta {
+  name: Чужая заявка — 403
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/applications/{{appId}}
+  body: none
+  auth: none
+}
+
+docs {
+  Создайте заявку как client1, затем выполните «Войти как client2» и этот запрос — ответ 403.
+}

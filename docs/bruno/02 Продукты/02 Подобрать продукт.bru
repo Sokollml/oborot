@@ -1,0 +1,19 @@
+meta {
+  name: Подобрать продукт
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/products/recommend
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "purpose": "urgent",
+    "amount": 2000000,
+    "term_months": 12
+  }
+}

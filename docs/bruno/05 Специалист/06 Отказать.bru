@@ -1,0 +1,19 @@
+meta {
+  name: Отказать
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/analyst/applications/{{appId}}/decision
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "action": "reject",
+    "client_reason": "Не удалось подтвердить выручку",
+    "comment": "Выписка не совпадает с анкетой"
+  }
+}
