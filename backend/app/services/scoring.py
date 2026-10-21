@@ -150,9 +150,9 @@ def score(data: ScoringInput) -> ScoringResult:
     elif data.max_overdue_days_2y == 0:
         pts, value, comment = ch["no_history"], "закрытых кредитов нет", "Кредитной истории пока мало — это нейтрально"
     elif data.max_overdue_days_2y <= 30:
-        pts, value, comment = ch["overdue_up_to_30"], f"просрочка до {data.max_overdue_days_2y} дн.", "Была небольшая просрочка платежа"
+        pts, value, comment = ch["overdue_up_to_30"], f"{data.max_overdue_days_2y} дн.", "Была небольшая просрочка платежа"
     else:
-        pts, value, comment = ch["overdue_31_89"], f"просрочка {data.max_overdue_days_2y} дн.", "Была заметная просрочка платежа"
+        pts, value, comment = ch["overdue_31_89"], f"{data.max_overdue_days_2y} дн.", "Была заметная просрочка платежа"
     factors.append(Factor("credit_history", "Кредитная история", value, pts, comment))
 
     rt = f["revenue_trend"]
