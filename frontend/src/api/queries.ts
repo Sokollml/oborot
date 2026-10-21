@@ -20,6 +20,7 @@ import type {
   Purpose,
   QueueItem,
   RecommendResult,
+  Stats,
   User,
 } from './types';
 
@@ -281,4 +282,14 @@ export function useMessages(applicationId: number, role: 'client' | 'analyst') {
     onSuccess: (messages) => qc.setQueryData(['messages', role, applicationId], messages),
   });
   return { list, send };
+}
+
+// ---------- Аналитика и кредиты ----------
+
+export function useStats() {
+  return useQuery({ queryKey: ['stats'], queryFn: () => api.get<Stats>('/analyst/stats'), refetchInterval: 10000 });
+}
+
+export function useMyLoans() {
+  return useQuery({ queryKey: ['loans'], queryFn: () => api.get<Application[]>('/loans') });
 }

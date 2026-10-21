@@ -66,6 +66,9 @@ def test_scenario_1_full_happy_path(client1):
     timeline = [h["to_status"] for h in client1.get(f"/api/applications/{app_id}/history").json()]
     assert timeline == ["DRAFT", "SUBMITTED", "CHECKING", "SCORING", "OFFER", "SIGNING", "ISSUED"]
 
+    loans = client1.get("/api/loans").json()
+    assert [loan["id"] for loan in loans] == [app_id] and loans[0]["decision"]["amount"] == 2_000_000
+
 
 def test_scenario_4_rejection_explains_why(client1):
     app_id = run_scenario(client1, SCENARIOS["4_zakat"])

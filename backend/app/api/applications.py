@@ -93,6 +93,17 @@ def list_applications(db: DB, user: ClientUser) -> list[ApplicationListItem]:
     return [application_list_item(a) for a in apps]
 
 
+@router.get("/loans", response_model=list[ApplicationOut], summary="Мои кредиты (выданные)")
+def my_loans(db: DB, user: ClientUser) -> list[ApplicationOut]:
+    apps = db.scalars(
+        select(Application)
+        .join(Company)
+        .where(Company.owner_user_id == user.id, Application.status == AppStatus.ISSUED)
+        .order_by(Application.updated_at.desc())
+    ).all()
+    return [application_out(db, a) for a in apps]
+
+
 @router.post("/applications", response_model=ApplicationOut, status_code=201, summary="Создать черновик заявки")
 def create_application(body: ApplicationCreate, db: DB, user: ClientUser) -> ApplicationOut:
     product = _product(db, body.product_code)

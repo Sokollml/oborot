@@ -29,3 +29,5 @@ export type AnalystDecisionIn = S['AnalystDecisionIn'];
 export type MyCompany = S['MyCompanyOut'];
 export type Potential = S['PotentialOut'];
 export type Message = S['MessageOut'];
+export type Stats = S['StatsOut'];
+export type StatItem = S['StatItem'];

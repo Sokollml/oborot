@@ -1,6 +1,6 @@
 // Прозрачные условия до подписания: график платежей, ПСК и основные условия кредита.
-import { Button, Group, Modal, ScrollArea, SimpleGrid, Stack, Table, Text } from '@mantine/core';
-import { IconCalendarStats, IconFileDescription } from '@tabler/icons-react';
+import { Anchor, Button, Checkbox, Group, Modal, Paper, ScrollArea, SimpleGrid, Stack, Table, Text, ThemeIcon } from '@mantine/core';
+import { IconCalendarStats, IconFileDescription, IconFileText } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -73,7 +73,7 @@ function Fact({ label, value }: { label: ReactNode; value: ReactNode }) {
   );
 }
 
-function Conditions({ app }: { app: Application }) {
+export function Conditions({ app }: { app: Application }) {
   const d = app.decision!;
   const rows: [ReactNode, ReactNode][] = [
     ['Заёмщик', `${app.company.name}, ИНН ${app.company.inn}`],
@@ -142,4 +142,96 @@ export function nextPaymentDate(issuedAt: string): string {
   do next.setMonth(next.getMonth() + 1);
   while (next < now);
   return date(next.toISOString());
+}
+
+// ---------- Пакет документов на подпись ----------
+
+function Guarantee({ app }: { app: Application }) {
+  const d = app.decision!;
+  return (
+    <Stack gap="sm">
+      <Text size="sm">
+        <b>Поручитель:</b> {app.company.director} — руководитель {app.company.name}.
+      </Text>
+      <Text size="sm">
+        Поручитель обязуется отвечать перед банком за исполнение заёмщиком обязательств по кредиту на сумму {rub(d.amount)} сроком{' '}
+        {months(d.term)} в том же объёме, что и заёмщик: основной долг, проценты и возможные неустойки.
+      </Text>
+      <Text size="sm">Поручительство действует до полного погашения кредита. Подписывается тем же кодом, что и кредитный договор.</Text>
+      <Text size="xs" c="dimmed">
+        Демо: для беззалоговых кредитов банк обычно просит поручительство собственника бизнеса. Мы условно считаем им руководителя из реестра.
+      </Text>
+    </Stack>
+  );
+}
+
+function Pledge({ app }: { app: Application }) {
+  return (
+    <Stack gap="sm">
+      <Text size="sm">
+        <b>Предмет залога:</b> {app.collateral_description ?? 'по описанию в заявке'}.
+      </Text>
+      <Text size="sm">
+        Имущество остаётся у {app.company.name} и используется в работе. Банк вправе обратить на него взыскание, только если кредит не будет
+        возвращён. Залог прекращается после полного погашения.
+      </Text>
+      <Text size="xs" c="dimmed">
+        Демо: оценка и регистрация залога в реальном процессе проходят до выдачи.
+      </Text>
+    </Stack>
+  );
+}
+
+/**
+ * Документы, которые клиент подписывает одним кодом. Пока он не отметил, что ознакомился, код ввести нельзя.
+ * onReadChange — сообщает блоку подписи, можно ли разблокировать ввод кода.
+ */
+export function SigningDocuments({ app, onReadChange }: { app: Application; onReadChange: (read: boolean) => void }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const [read, setRead] = useState(false);
+  const start = useMemo(() => new Date(), []);
+  const docs: { key: string; title: string; body: ReactNode }[] = [
+    { key: 'contract', title: 'Кредитный договор — индивидуальные условия', body: <Conditions app={app} /> },
+    { key: 'schedule', title: 'График платежей', body: <ScheduleTable app={app} start={start} /> },
+    app.product.needs_collateral
+      ? { key: 'pledge', title: 'Договор залога', body: <Pledge app={app} /> }
+      : { key: 'guarantee', title: `Договор поручительства — ${app.company.director}`, body: <Guarantee app={app} /> },
+  ];
+  const current = docs.find((d) => d.key === open);
+  return (
+    <Stack gap="xs">
+      <Text size="sm" fw={600}>
+        Документы на подпись
+      </Text>
+      {docs.map((d) => (
+        <Paper key={d.key} p="sm" radius="lg" bg="gray.0">
+          <Group justify="space-between" wrap="nowrap">
+            <Group gap="sm" wrap="nowrap">
+              <ThemeIcon size={30} radius="md" variant="light" color="gray">
+                <IconFileText size={18} />
+              </ThemeIcon>
+              <Text size="sm" fw={500}>
+                {d.title}
+              </Text>
+            </Group>
+            <Anchor component="button" type="button" size="sm" fw={600} onClick={() => setOpen(d.key)}>
+              Открыть
+            </Anchor>
+          </Group>
+        </Paper>
+      ))}
+      <Checkbox
+        mt="xs"
+        checked={read}
+        onChange={(e) => {
+          setRead(e.currentTarget.checked);
+          onReadChange(e.currentTarget.checked);
+        }}
+        label="Я ознакомился с документами и согласен с условиями"
+      />
+      <Modal opened={current !== undefined} onClose={() => setOpen(null)} title={<b>{current?.title}</b>} size="xl" centered>
+        {current?.body}
+      </Modal>
+    </Stack>
+  );
 }

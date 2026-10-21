@@ -2,6 +2,14 @@ const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
 
 export const rub = (value: number | null | undefined) => (value == null ? '—' : `${money.format(value)} ₽`);
 
+/** Крупные суммы коротко: «22 млн ₽», «1,4 млн ₽», «850 тыс. ₽». */
+export function rubShort(value: number | null | undefined): string {
+  if (value == null) return '—';
+  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString('ru-RU', { maximumFractionDigits: 1 })} млн ₽`;
+  if (value >= 1_000) return `${Math.round(value / 1_000)} тыс. ₽`;
+  return rub(value);
+}
+
 export function plural(n: number, one: string, few: string, many: string): string {
   const mod10 = n % 10;
   const mod100 = n % 100;

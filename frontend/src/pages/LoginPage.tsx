@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Anchor, Badge, Button, Center, Container, Group, Paper, PasswordInput, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core';
 import { IconInfoCircle, IconStairsUp } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import { errorText } from '../api/client';
@@ -45,7 +45,10 @@ export function LoginPage() {
             <Title order={1}>Ступени</Title>
           </Group>
           <Text ta="center" c="dimmed">
-            Кредит для бизнеса онлайн: подбор, заявка и решение в одном кабинете
+            Кредит для бизнеса онлайн: подбор, заявка и решение в одном кабинете ·{' '}
+            <Anchor component={Link} to="/welcome">
+              о продукте
+            </Anchor>
           </Text>
 
           <Paper shadow="sm" p="xl" component="form" onSubmit={onSubmit} noValidate>

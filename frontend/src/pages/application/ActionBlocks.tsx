@@ -8,7 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { errorText } from '../../api/client';
 import { useAcceptOffer, useCloneApplication, useDeclineOffer, useSign, useUploadDocument } from '../../api/queries';
 import type { Application } from '../../api/types';
-import { LoanDetailsButtons, nextPaymentDate } from '../../components/LoanDetails';
+import { LoanDetailsButtons, nextPaymentDate, SigningDocuments } from '../../components/LoanDetails';
 import { annuity, months, rate, rub } from '../../lib/format';
 import { Term } from '../../lib/glossary';
 
@@ -168,32 +168,33 @@ function Big({ label, value, accent }: { label: ReactNode; value: string; accent
 
 export function SignBlock({ app }: { app: Application }) {
   const [code, setCode] = useState('');
+  const [read, setRead] = useState(false);
   const sign = useSign(app.id);
   return (
     <Stack>
-      <Paper p="md" radius="md" bg="gray.0">
+      <SigningDocuments app={app} onReadChange={setRead} />
+      <Paper p="md" radius="lg" bg={read ? 'accent.0' : 'gray.0'} style={{ opacity: read ? 1 : 0.6 }}>
         <Text size="sm" c="dimmed">
           Код подтверждения
         </Text>
         <Text size="xl" fw={700} ff="monospace" style={{ letterSpacing: 4 }}>
-          {app.signing_code}
+          {read ? app.signing_code : '••••••'}
         </Text>
         <Text size="xs" c="dimmed">
-          Это демо: в настоящем сервисе код пришёл бы в защищённое приложение. Здесь он показан на экране.
+          {read
+            ? 'Это демо: в настоящем сервисе код пришёл бы в защищённое приложение. Здесь он показан на экране.'
+            : 'Код появится, когда вы отметите, что ознакомились с документами.'}
         </Text>
       </Paper>
-      <Text size="sm">
-        Договор: {rub(app.decision?.amount)} на {months(app.decision?.term)}, {rate(app.decision?.rate)}, платёж {rub(app.decision?.monthly_payment)} в месяц.
-      </Text>
       <Group align="flex-end">
         <div>
           <Text size="sm" mb={4}>
-            Введите код
+            Введите код — им подписываются все документы сразу
           </Text>
-          <PinInput length={6} type="number" oneTimeCode value={code} onChange={setCode} error={!!sign.error} />
+          <PinInput length={6} type="number" oneTimeCode value={code} onChange={setCode} error={!!sign.error} disabled={!read} />
         </div>
-        <Button onClick={() => sign.mutate({ code })} disabled={code.length !== 6} loading={sign.isPending}>
-          Подписать договор
+        <Button onClick={() => sign.mutate({ code })} disabled={!read || code.length !== 6} loading={sign.isPending}>
+          Подписать
         </Button>
       </Group>
       {sign.error && <Alert color="red">{errorText(sign.error)}</Alert>}

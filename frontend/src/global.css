@@ -93,3 +93,24 @@ h1, h2, h3, h4 {
     #0b1f35 !important;
   color: #ffffff;
 }
+
+/* Боковое меню кабинета */
+.app-navbar {
+  background: #ffffff;
+  border-right: none !important;
+  box-shadow: 1px 0 0 #ebedef;
+}
+.app-navlink {
+  border-radius: 12px;
+  font-weight: 600;
+  color: #0b1f35;
+  padding: 10px 12px;
+}
+.app-navlink[data-active] {
+  background: #f3f4f5;
+  color: #0b1f35;
+  box-shadow: inset 3px 0 0 var(--mantine-color-accent-6);
+}
+.app-navlink[data-active] .mantine-NavLink-section {
+  color: var(--mantine-color-accent-6);
+}
