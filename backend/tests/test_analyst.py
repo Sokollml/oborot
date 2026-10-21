@@ -41,7 +41,7 @@ def test_scenario_5_invest_manual_approve(client1, analyst, db):
     assert db.scalar(select(Notification).where(Notification.user_id == 3, Notification.application_id == app_id))
 
     card = analyst.get(f"/api/analyst/applications/{app_id}").json()
-    assert {c["source"] for c in card["checks"]} == {"egrul", "fns", "bki"}
+    assert {c["source"] for c in card["checks"]} == {"egrul", "fns", "bki", "account"}
     assert all(c["level"] == "ok" for c in card["checks"])
     assert len(card["scoring"]["factors"]) == 7
     rec = card["recommendation"]

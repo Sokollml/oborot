@@ -12,8 +12,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.companies import get_or_create_company
+from app.services import external
 from app.deps import DB, ClientUser, get_owned_application
-from app.enums import ActorType, AppStatus, JobStatus, JobType
+from app.enums import ActorType, AppStatus, CheckSource, JobStatus, JobType
 from app.errors import Conflict, NotFound, ValidationFailed
 from app.models import Application, Company, Job, Product, StatusHistory
 from app.schemas import (
@@ -35,6 +36,14 @@ def _product(db: Session, code: str) -> Product:
     if product is None:
         raise NotFound("Такого кредитного продукта нет")
     return product
+
+
+def _account(inn: str) -> dict | None:
+    try:
+        data = external.fetch(CheckSource.ACCOUNT, inn, retries=1, timeout=2.0)
+    except (external.ExternalServiceError, external.CompanyNotFoundInRegistry):
+        return None  # без оборотов клиент просто введёт выручку сам
+    return data if data.get("has_account") else None
 
 
 def _rub(value: int) -> str:
@@ -92,6 +101,12 @@ def create_application(body: ApplicationCreate, db: DB, user: ClientUser) -> App
         term_months=body.term_months,
         status=AppStatus.DRAFT,
     )
+    # Компания обслуживается в банке → выручку берём из оборотов по счёту, клиенту остаётся проверить.
+    account = _account(company.inn)
+    if account:
+        app.revenue_12m = account["revenue_12m"]
+        app.revenue_prev_year = account["revenue_prev_12m"]
+        app.revenue_prefilled = True
     db.add(app)
     db.flush()
     db.add(StatusHistory(application_id=app.id, from_status=None, to_status=AppStatus.DRAFT, actor_type=ActorType.CLIENT, actor_id=user.id))

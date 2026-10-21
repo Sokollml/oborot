@@ -111,6 +111,23 @@ DEMO_APPLICATIONS = [
 ]
 
 
+# Компании, которые «обслуживаются» у клиентов: на главной для них можно рассчитать предодобренный лимит.
+DEMO_COMPANIES = {
+    "client1@demo.local": ["0010000017", "0010000024", "0010000031", "0010000049", "0010000056"],
+    "client2@demo.local": ["001000001006"],
+}
+
+
+def seed_demo_companies(db: Session) -> None:
+    from app.api.companies import get_or_create_company  # локальный импорт: избегаем цикла
+
+    for email, inns in DEMO_COMPANIES.items():
+        user = db.scalar(select(User).where(User.email == email))
+        for inn in inns:
+            get_or_create_company(db, user, inn)
+    db.commit()
+
+
 def seed_demo_applications(db: Session) -> None:
     from app.api.companies import get_or_create_company  # локальный импорт: избегаем цикла
 
@@ -137,6 +154,7 @@ if __name__ == "__main__":
     with SessionLocal() as session:
         seed(session)
         try:
+            seed_demo_companies(session)
             seed_demo_applications(session)
         except AppError as exc:
             # Без мок-сервиса демо-заявки не создать, но API должен запуститься всё равно.

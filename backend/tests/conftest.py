@@ -84,12 +84,12 @@ _mock = _load_mock_module()
 _mock_client = TestClient(_mock.app)
 
 
-def fake_fetch(source: CheckSource, inn: str) -> dict:
+def fake_fetch(source: CheckSource, inn: str, **_kwargs) -> dict:
     """Ответ мок-сервиса без сети. «Зависший» БКИ сразу даёт ошибку, как после всех повторов."""
     company = _mock.COMPANIES.get(inn)
     if company and source == CheckSource.BKI and company.get("bki_timeout"):
         raise external.ExternalServiceError("бюро кредитных историй (БКИ) не отвечает: timeout")
-    response = _mock_client.get(f"/{source}/{inn}")
+    response = _mock_client.get(f"/{external.PATHS[source]}/{inn}")
     if response.status_code == 404:
         raise external.CompanyNotFoundInRegistry(inn)
     return response.json()

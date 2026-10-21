@@ -311,6 +311,127 @@
         }
       }
     },
+    "/api/companies": {
+      "get": {
+        "tags": [
+          "Компании"
+        ],
+        "summary": "Мои компании и предодобренные лимиты",
+        "operationId": "my_companies_api_companies_get",
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyCompanyOut"
+                  },
+                  "title": "Response My Companies Api Companies Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}/potential": {
+      "post": {
+        "tags": [
+          "Компании"
+        ],
+        "summary": "Рассчитать предодобренный лимит (без документов)",
+        "operationId": "calculate_potential_api_companies__company_id__potential_post",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Company Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PotentialRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyCompanyOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/applications": {
       "get": {
         "tags": [
@@ -1481,6 +1602,272 @@
           }
         }
       }
+    },
+    "/api/applications/{application_id}/messages": {
+      "get": {
+        "tags": [
+          "Переписка"
+        ],
+        "summary": "Переписка по заявке",
+        "operationId": "client_messages_api_applications__application_id__messages_get",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageOut"
+                  },
+                  "title": "Response Client Messages Api Applications  Application Id  Messages Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Переписка"
+        ],
+        "summary": "Написать специалисту",
+        "operationId": "client_post_api_applications__application_id__messages_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageOut"
+                  },
+                  "title": "Response Client Post Api Applications  Application Id  Messages Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/analyst/applications/{application_id}/messages": {
+      "get": {
+        "tags": [
+          "Переписка",
+          "Кабинет специалиста"
+        ],
+        "summary": "Переписка с клиентом",
+        "operationId": "analyst_messages_api_analyst_applications__application_id__messages_get",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageOut"
+                  },
+                  "title": "Response Analyst Messages Api Analyst Applications  Application Id  Messages Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Переписка",
+          "Кабинет специалиста"
+        ],
+        "summary": "Написать клиенту",
+        "operationId": "analyst_post_api_analyst_applications__application_id__messages_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageOut"
+                  },
+                  "title": "Response Analyst Post Api Analyst Applications  Application Id  Messages Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1921,6 +2308,11 @@
             "type": "boolean",
             "title": "Bki Consent"
           },
+          "revenue_prefilled": {
+            "type": "boolean",
+            "title": "Revenue Prefilled",
+            "description": "Выручка подставлена из оборотов по счёту в банке"
+          },
           "decision": {
             "anyOf": [
               {
@@ -1979,6 +2371,7 @@
           "employees",
           "collateral_description",
           "bki_consent",
+          "revenue_prefilled",
           "decision",
           "documents",
           "signing_code",
@@ -2616,6 +3009,59 @@
         ],
         "title": "LoginIn"
       },
+      "MessageIn": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "examples": [
+              "Выписку загрузил, нужен ли ещё отчёт?"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "MessageIn"
+      },
+      "MessageOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "author_role": {
+            "type": "string",
+            "title": "Author Role",
+            "description": "client — клиент, analyst — специалист"
+          },
+          "author_name": {
+            "type": "string",
+            "title": "Author Name"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "author_role",
+          "author_name",
+          "text",
+          "created_at"
+        ],
+        "title": "MessageOut"
+      },
       "MetaOut": {
         "properties": {
           "demo_mode": {
@@ -2647,6 +3093,46 @@
           "demo_mode"
         ],
         "title": "MetaOut"
+      },
+      "MyCompanyOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "potential": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PotentialOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Последний расчёт лимита; null — ещё не считали"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "inn",
+          "name",
+          "status",
+          "potential"
+        ],
+        "title": "MyCompanyOut"
       },
       "NextActionOut": {
         "properties": {
@@ -2774,6 +3260,164 @@
           "unread_count"
         ],
         "title": "NotificationsOut"
+      },
+      "PotentialOffer": {
+        "properties": {
+          "product_code": {
+            "type": "string",
+            "title": "Product Code",
+            "examples": [
+              "EXPRESS"
+            ]
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount",
+            "description": "Максимальная сумма с автоматическим одобрением, ₽",
+            "examples": [
+              3000000
+            ]
+          },
+          "term_months": {
+            "type": "integer",
+            "title": "Term Months"
+          },
+          "rate": {
+            "type": "number",
+            "title": "Rate"
+          },
+          "monthly_payment": {
+            "type": "integer",
+            "title": "Monthly Payment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_code",
+          "product_name",
+          "amount",
+          "term_months",
+          "rate",
+          "monthly_payment"
+        ],
+        "title": "PotentialOffer"
+      },
+      "PotentialOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "ok — есть предложение, none — нет, no_account — нет счёта в банке, unavailable — сервис не ответил"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "examples": [
+              "Вам предварительно одобрено до 13 750 000 ₽"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "max_amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Amount"
+          },
+          "offers": {
+            "items": {
+              "$ref": "#/components/schemas/PotentialOffer"
+            },
+            "type": "array",
+            "title": "Offers"
+          },
+          "revenue_12m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue 12M",
+            "description": "Поступления на счёт за 12 месяцев"
+          },
+          "revenue_prev_12m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Prev 12M"
+          },
+          "drivers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Drivers",
+            "description": "Что помогло"
+          },
+          "tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tips",
+            "description": "Как увеличить лимит"
+          },
+          "calculated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calculated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "title",
+          "text"
+        ],
+        "title": "PotentialOut"
+      },
+      "PotentialRequest": {
+        "properties": {
+          "consent": {
+            "type": "boolean",
+            "title": "Consent",
+            "description": "Согласие на запрос кредитной истории — без него лимит не считаем",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "consent"
+        ],
+        "title": "PotentialRequest"
       },
       "ProductOption": {
         "properties": {

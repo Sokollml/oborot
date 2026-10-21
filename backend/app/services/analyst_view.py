@@ -17,6 +17,7 @@ CHECK_TITLES = {
     CheckSource.EGRUL: "Реестр компаний (ЕГРЮЛ)",
     CheckSource.FNS: "Налоговая (ФНС)",
     CheckSource.BKI: "Кредитная история (БКИ)",
+    CheckSource.ACCOUNT: "Счёт в банке",
 }
 STOP_CODES = {"company_status", "overdue_90", "young_business"}
 STATUS_TEXT = {"active": "действует", "liquidating": "ликвидируется", "bankrupt": "банкротство"}
@@ -27,7 +28,30 @@ def _worst(lines: list[CheckLine]) -> str:
     return "bad" if "bad" in levels else "warn" if "warn" in levels else "ok"
 
 
-def _check_lines(source: str, p: dict) -> list[CheckLine]:
+def _rub(v: int) -> str:
+    return f"{v / 1_000_000:.1f} млн ₽".replace(".", ",")
+
+
+def _account_lines(p: dict, declared: int | None) -> list[CheckLine]:
+    """Сверка: заявленная в анкете выручка против поступлений на счёт в нашем банке."""
+    if not p.get("has_account"):
+        return [CheckLine(label="Счёт в банке", value="нет — выручку подтверждает выписка", level="warn")]
+    turnover = p["revenue_12m"]
+    lines = [
+        CheckLine(label="Поступления за 12 мес.", value=_rub(turnover), level="ok"),
+        CheckLine(label="Годом ранее", value=_rub(p["revenue_prev_12m"]), level="ok"),
+    ]
+    if declared:
+        gap = (declared - turnover) / turnover * 100 if turnover else 100.0
+        level = "ok" if gap <= 20 else "warn" if gap <= 50 else "bad"
+        value = "совпадает с оборотами" if abs(gap) < 1 else f"{_rub(declared)} ({'+' if gap > 0 else ''}{gap:.0f}%)"
+        lines.append(CheckLine(label="Заявлено в анкете", value=value, level=level))
+    return lines
+
+
+def _check_lines(source: str, p: dict, declared_revenue: int | None = None) -> list[CheckLine]:
+    if source == CheckSource.ACCOUNT and "error" not in p:
+        return _account_lines(p, declared_revenue)
     if "error" in p:
         return [CheckLine(label="Ответ сервиса", value="не получен после всех попыток", level="bad")]
     if source == CheckSource.EGRUL:
@@ -53,7 +77,7 @@ def _check_lines(source: str, p: dict) -> list[CheckLine]:
     ]
 
 
-def checks(db: Session, app_id: int) -> list[CheckOut]:
+def checks(db: Session, app_id: int, declared_revenue: int | None = None) -> list[CheckOut]:
     out = []
     for source in CheckSource:
         row = db.scalar(
@@ -64,7 +88,7 @@ def checks(db: Session, app_id: int) -> list[CheckOut]:
         )
         if row is None:
             continue
-        lines = _check_lines(source, row.payload)
+        lines = _check_lines(source, row.payload, declared_revenue)
         out.append(CheckOut(source=source, title=CHECK_TITLES[source], ok=row.ok, level=_worst(lines), lines=lines, fetched_at=row.fetched_at))
     return out
 

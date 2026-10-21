@@ -38,6 +38,7 @@ class CheckSource(StrEnum):
     EGRUL = "egrul"
     FNS = "fns"
     BKI = "bki"
+    ACCOUNT = "account"  # расчётный счёт в нашем банке (обороты из АБС)
 
 
 class DecisionType(StrEnum):

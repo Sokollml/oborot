@@ -56,6 +56,9 @@ class Company(Base):
     registered_at: Mapped[date] = mapped_column(Date, nullable=False)
     status: Mapped[str] = mapped_column(String(16), nullable=False)
     director: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Предодобренный лимит («кредитный потенциал»): результат последнего расчёта и когда он сделан.
+    potential: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+    potential_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Product(Base):
@@ -88,6 +91,8 @@ class Application(Base):
     employees: Mapped[int | None] = mapped_column(Integer)
     collateral_description: Mapped[str | None] = mapped_column(Text)
     bki_consent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # Выручка подставлена из оборотов по счёту в банке (клиент мог её поправить).
+    revenue_prefilled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
     # Меняется ТОЛЬКО через services.state_machine.transition().
     status: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     # Код подписания (симуляция): генерируется при переходе в SIGNING и показывается клиенту.
@@ -175,6 +180,19 @@ class Notification(Base):
     application_id: Mapped[int | None] = mapped_column(ForeignKey("applications.id"))
     text: Mapped[str] = mapped_column(Text, nullable=False)
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    created_at: Mapped[datetime] = _created_at()
+
+
+class ApplicationMessage(Base):
+    """Переписка по заявке между клиентом и специалистом."""
+
+    __tablename__ = "application_messages"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    application_id: Mapped[int] = mapped_column(ForeignKey("applications.id"), nullable=False, index=True)
+    author_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    author_role: Mapped[str] = mapped_column(String(16), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = _created_at()
 
 

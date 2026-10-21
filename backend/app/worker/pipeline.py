@@ -58,13 +58,15 @@ def stage_checking(application_id: int) -> None:
     # Сетевые запросы делаем ВНЕ транзакции, чтобы не держать блокировку заявки десятки секунд.
     results: dict[CheckSource, dict] = {}
     failures: list[str] = []
-    for source in (CheckSource.EGRUL, CheckSource.FNS, CheckSource.BKI):
+    for source in (CheckSource.EGRUL, CheckSource.FNS, CheckSource.BKI, CheckSource.ACCOUNT):
         try:
             results[source] = external.fetch(source, inn)
         except (external.ExternalServiceError, external.CompanyNotFoundInRegistry) as exc:
             log.warning("заявка %s: %s недоступен: %s", application_id, source, exc)
-            failures.append(external.SOURCE_NAMES[source])
             results[source] = {"error": str(exc) or "нет данных"}
+            # Обороты по счёту — данные самого банка и для скоринга не обязательны: без них не останавливаемся.
+            if source != CheckSource.ACCOUNT:
+                failures.append(external.SOURCE_NAMES[source])
 
     with SessionLocal() as db, db.begin():
         app = _lock(db, application_id)

@@ -70,6 +70,30 @@ async def fns(inn: str) -> dict[str, Any]:
     return {"inn": inn, **c["fns"]}
 
 
+def _month_label(months_ago: int) -> str:
+    d = _months_ago(months_ago)
+    return f"{d.year}-{d.month:02d}"
+
+
+@app.get("/abs/accounts/{inn}", tags=["АБС банка"], summary="Расчётный счёт клиента в банке: обороты за 24 месяца")
+async def account(inn: str) -> dict[str, Any]:
+    """Данные «своего» банка (автоматизированной банковской системы): есть ли у компании счёт и сколько на него
+    поступало. Так банк знает выручку клиента без справок и выписок. Компании без счёта — has_account: false."""
+    c = await _company(inn)
+    acc = c.get("account")
+    if not acc:
+        return {"inn": inn, "has_account": False}
+    monthly = acc["monthly_incoming"]  # 24 месяца, от старых к новым
+    return {
+        "inn": inn,
+        "has_account": True,
+        "opened_at": _months_ago(acc["opened_months_ago"]).isoformat(),
+        "months": [{"month": _month_label(24 - i), "incoming": v} for i, v in enumerate(monthly)],
+        "revenue_12m": sum(monthly[12:]),
+        "revenue_prev_12m": sum(monthly[:12]),
+    }
+
+
 @app.get("/bki/{inn}", tags=["БКИ"], summary="Кредитная история")
 async def bki(inn: str) -> dict[str, Any]:
     c = await _company(inn)

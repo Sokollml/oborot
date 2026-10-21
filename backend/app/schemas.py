@@ -184,6 +184,7 @@ class ApplicationOut(ORM):
     employees: int | None
     collateral_description: str | None
     bki_consent: bool
+    revenue_prefilled: bool = Field(description="Выручка подставлена из оборотов по счёту в банке")
     decision: DecisionOut | None = Field(description="Последнее решение по заявке, если есть")
     documents: list[DocumentRequestOut]
     signing_code: str | None = Field(description="Код подписания (симуляция) — только в статусе SIGNING")
@@ -314,3 +315,55 @@ class AnalystDecisionIn(BaseModel):
     doc_types: list[str] = Field(default_factory=list, description="Для request_docs: какие документы нужны", examples=[["bank_statement"]])
     client_reason: str | None = Field(default=None, description="Для reject: причина, которую увидит клиент")
     comment: str = Field(min_length=1, description="Комментарий специалиста — обязателен", examples=["Выручка подтверждена выпиской"])
+
+
+# ---------- Мои компании и предодобренный лимит ----------
+
+
+class PotentialOffer(BaseModel):
+    product_code: str = Field(examples=["EXPRESS"])
+    product_name: str
+    amount: int = Field(description="Максимальная сумма с автоматическим одобрением, ₽", examples=[3_000_000])
+    term_months: int
+    rate: float
+    monthly_payment: int
+
+
+class PotentialOut(BaseModel):
+    status: str = Field(description="ok — есть предложение, none — нет, no_account — нет счёта в банке, unavailable — сервис не ответил")
+    title: str = Field(examples=["Вам предварительно одобрено до 13 750 000 ₽"])
+    text: str
+    max_amount: int | None = None
+    offers: list[PotentialOffer] = Field(default_factory=list)
+    revenue_12m: int | None = Field(default=None, description="Поступления на счёт за 12 месяцев")
+    revenue_prev_12m: int | None = None
+    drivers: list[str] = Field(default_factory=list, description="Что помогло")
+    tips: list[str] = Field(default_factory=list, description="Как увеличить лимит")
+    calculated_at: datetime | None = None
+
+
+class MyCompanyOut(BaseModel):
+    id: int
+    inn: str
+    name: str
+    status: str
+    potential: PotentialOut | None = Field(description="Последний расчёт лимита; null — ещё не считали")
+
+
+class PotentialRequest(BaseModel):
+    consent: bool = Field(description="Согласие на запрос кредитной истории — без него лимит не считаем", examples=[True])
+
+
+# ---------- Переписка ----------
+
+
+class MessageOut(ORM):
+    id: int
+    author_role: str = Field(description="client — клиент, analyst — специалист")
+    author_name: str
+    text: str
+    created_at: datetime
+
+
+class MessageIn(BaseModel):
+    text: str = Field(min_length=1, max_length=2000, examples=["Выписку загрузил, нужен ли ещё отчёт?"])

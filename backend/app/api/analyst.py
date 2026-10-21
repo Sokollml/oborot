@@ -86,7 +86,7 @@ def _card(db: Session, app: Application) -> AnalystApplicationOut:
     decisions = db.scalars(select(Decision).where(Decision.application_id == app.id).order_by(Decision.id.desc())).all()
     return AnalystApplicationOut(
         application=application_out(db, app),
-        checks=analyst_view.checks(db, app.id),
+        checks=analyst_view.checks(db, app.id, app.revenue_12m),
         scoring=analyst_view.scoring_out(s),
         recommendation=analyst_view.recommendation(db, app, s),
         history=[

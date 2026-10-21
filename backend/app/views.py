@@ -45,6 +45,7 @@ def application_out(db: Session, app: Application) -> ApplicationOut:
         employees=app.employees,
         collateral_description=app.collateral_description,
         bki_consent=app.bki_consent,
+        revenue_prefilled=app.revenue_prefilled,
         decision=DecisionOut.model_validate(decision) if decision else None,
         documents=[
             DocumentRequestOut(
