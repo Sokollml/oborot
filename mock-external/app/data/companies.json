@@ -149,6 +149,25 @@
         "closed_loans_without_overdue": 0
       },
       "note": "Доп.: банкротство → стоп-фактор"
+    },
+    {
+      "inn": "0010000088",
+      "name": "ООО «Сфера-Тест»",
+      "ogrn": "1000000000087",
+      "registered_months_ago": 72,
+      "status": "active",
+      "director": "Орлов Глеб Максимович",
+      "okved": "22.29 — Производство прочих изделий из пластмасс",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 2,
+        "max_overdue_days_2y": 0,
+        "closed_loans_without_overdue": 5
+      },
+      "note": "Готовая заявка из seed: инвестиционный кредит → в очереди специалиста"
     }
   ]
 }
