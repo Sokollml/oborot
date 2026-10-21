@@ -8,7 +8,7 @@ name: stupeni
 x-backend-env: &backend-env
   DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-stupeni}:${POSTGRES_PASSWORD:-stupeni}@db:5432/${POSTGRES_DB:-stupeni}
   MOCK_EXTERNAL_URL: http://mock-external:8001
-  JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+  JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-0123456789abcdef}
   DEMO_MODE: ${DEMO_MODE:-true}
   DEMO_PASSWORD: ${DEMO_PASSWORD:-demo12345}
   STAGE_DELAY_SECONDS: ${STAGE_DELAY_SECONDS:-2}
@@ -25,6 +25,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-stupeni}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stupeni}
       POSTGRES_DB: ${POSTGRES_DB:-stupeni}
+    ports:
+      - "5433:5432" # для тестов бэкенда с хоста (uv run pytest); 5433 — чтобы не мешать локальному Postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -1,0 +1,2125 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Ступени API",
+    "description": "API цифрового кредитного конвейера для малого бизнеса. Кабинет клиента и кабинет аналитика работают с одной базой.\n\nКак попробовать в Swagger: выполните `POST /api/auth/login` (например, client1@demo.local / demo12345) — браузер сохранит cookie, и остальные запросы пойдут от этого пользователя.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Сервис"
+        ],
+        "summary": "Проверка, что API и база доступны",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Сервис"
+        ],
+        "summary": "Проверка через /api",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health Api Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Авторизация"
+        ],
+        "summary": "Войти по email и паролю",
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Авторизация"
+        ],
+        "summary": "Выйти",
+        "operationId": "logout_api_auth_logout_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "Авторизация"
+        ],
+        "summary": "Текущий пользователь",
+        "operationId": "me_api_auth_me_get",
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/meta": {
+      "get": {
+        "tags": [
+          "Авторизация",
+          "Сервис"
+        ],
+        "summary": "Настройки для фронтенда (демо-режим)",
+        "operationId": "meta_api_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": [
+          "Продукты"
+        ],
+        "summary": "Список кредитных продуктов",
+        "operationId": "list_products_api_products_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Products Api Products Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/products/recommend": {
+      "post": {
+        "tags": [
+          "Продукты"
+        ],
+        "summary": "Подобрать продукт по цели, сумме и сроку",
+        "operationId": "recommend_product_api_products_recommend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecommendIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/lookup": {
+      "get": {
+        "tags": [
+          "Компании"
+        ],
+        "summary": "Найти компанию по ИНН (автозаполнение)",
+        "operationId": "lookup_api_companies_lookup_get",
+        "parameters": [
+          {
+            "name": "inn",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "ИНН: 10 или 12 цифр",
+              "examples": [
+                "0010000017"
+              ],
+              "title": "Inn"
+            },
+            "description": "ИНН: 10 или 12 цифр"
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyLookupOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications": {
+      "get": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Мои заявки",
+        "operationId": "list_applications_api_applications_get",
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationListItem"
+                  },
+                  "title": "Response List Applications Api Applications Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Создать черновик заявки",
+        "operationId": "create_application_api_applications_post",
+        "parameters": [
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}": {
+      "get": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Заявка и что делать дальше",
+        "operationId": "get_application_api_applications__application_id__get",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Сохранить черновик",
+        "operationId": "patch_application_api_applications__application_id__patch",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/submit": {
+      "post": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Отправить заявку",
+        "description": "Отправка заявки на рассмотрение.\n\nИдемпотентность: если клиент нажал «Отправить» дважды или пропала сеть и браузер повторил\nзапрос — второй запрос с тем же Idempotency-Key просто вернёт текущее состояние заявки.\nЗаявка и задача для воркера сохраняются в ОДНОЙ транзакции: либо обе, либо ничего.",
+        "operationId": "submit_application_api_applications__application_id__submit_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128,
+              "description": "Уникальный ключ отправки. Повторный запрос с тем же ключом не создаёт вторую отправку.",
+              "title": "Idempotency-Key"
+            },
+            "description": "Уникальный ключ отправки. Повторный запрос с тем же ключом не создаёт вторую отправку."
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/history": {
+      "get": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "История статусов",
+        "operationId": "get_history_api_applications__application_id__history_get",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HistoryItem"
+                  },
+                  "title": "Response Get History Api Applications  Application Id  History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/cancel": {
+      "post": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Отозвать черновик",
+        "operationId": "cancel_application_api_applications__application_id__cancel_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/offer/accept": {
+      "post": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Принять предложение",
+        "operationId": "accept_offer_api_applications__application_id__offer_accept_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/offer/decline": {
+      "post": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Отказаться от предложения",
+        "operationId": "decline_offer_api_applications__application_id__offer_decline_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/applications/{application_id}/sign": {
+      "post": {
+        "tags": [
+          "Заявки клиента"
+        ],
+        "summary": "Подписать договор кодом",
+        "operationId": "sign_api_applications__application_id__sign_post",
+        "parameters": [
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Application Id"
+            }
+          },
+          {
+            "name": "access_token",
+            "in": "cookie",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ActorType": {
+        "type": "string",
+        "enum": [
+          "client",
+          "analyst",
+          "system"
+        ],
+        "title": "ActorType"
+      },
+      "AppStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "SUBMITTED",
+          "CHECKING",
+          "SCORING",
+          "OFFER",
+          "MANUAL_REVIEW",
+          "INFO_REQUESTED",
+          "REJECTED",
+          "SIGNING",
+          "ISSUED",
+          "CANCELLED"
+        ],
+        "title": "AppStatus"
+      },
+      "ApplicationCreate": {
+        "properties": {
+          "product_code": {
+            "type": "string",
+            "title": "Product Code",
+            "description": "Код продукта",
+            "examples": [
+              "EXPRESS"
+            ]
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn",
+            "description": "ИНН компании (10 цифр) или ИП (12 цифр)",
+            "examples": [
+              "0010000017"
+            ]
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/Purpose",
+            "examples": [
+              "urgent"
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "examples": [
+              2000000
+            ]
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months",
+            "examples": [
+              12
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_code",
+          "inn",
+          "purpose"
+        ],
+        "title": "ApplicationCreate"
+      },
+      "ApplicationListItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AppStatus"
+          },
+          "status_label": {
+            "type": "string",
+            "title": "Status Label"
+          },
+          "action_required": {
+            "type": "boolean",
+            "title": "Action Required",
+            "description": "Нужно действие клиента — показываем плашку"
+          },
+          "product_name": {
+            "type": "string",
+            "title": "Product Name"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "status_label",
+          "action_required",
+          "product_name",
+          "company_name",
+          "amount",
+          "term_months",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ApplicationListItem"
+      },
+      "ApplicationOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AppStatus"
+          },
+          "status_label": {
+            "type": "string",
+            "title": "Status Label",
+            "examples": [
+              "Проверяем данные"
+            ]
+          },
+          "next_action": {
+            "$ref": "#/components/schemas/NextActionOut"
+          },
+          "product": {
+            "$ref": "#/components/schemas/ProductOut"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyOut"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/Purpose"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months"
+          },
+          "revenue_12m": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue 12M"
+          },
+          "revenue_prev_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Prev Year"
+          },
+          "monthly_debt_payments": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Debt Payments"
+          },
+          "employees": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employees"
+          },
+          "collateral_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collateral Description"
+          },
+          "bki_consent": {
+            "type": "boolean",
+            "title": "Bki Consent"
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Последнее решение по заявке, если есть"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentRequestOut"
+            },
+            "type": "array",
+            "title": "Documents"
+          },
+          "signing_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signing Code",
+            "description": "Код подписания (симуляция) — только в статусе SIGNING"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "status_label",
+          "next_action",
+          "product",
+          "company",
+          "purpose",
+          "amount",
+          "term_months",
+          "revenue_12m",
+          "revenue_prev_year",
+          "monthly_debt_payments",
+          "employees",
+          "collateral_description",
+          "bki_consent",
+          "decision",
+          "documents",
+          "signing_code",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ApplicationOut",
+        "description": "Состояние заявки. Фронт опрашивает этот ответ раз в 3 секунды."
+      },
+      "ApplicationPatch": {
+        "properties": {
+          "product_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Code",
+            "examples": [
+              "EXPRESS"
+            ]
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Purpose"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount",
+            "description": "Сумма кредита, ₽",
+            "examples": [
+              2000000
+            ]
+          },
+          "term_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term Months",
+            "description": "Срок, мес.",
+            "examples": [
+              12
+            ]
+          },
+          "revenue_12m": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue 12M",
+            "description": "Выручка за последние 12 месяцев, ₽",
+            "examples": [
+              30000000
+            ]
+          },
+          "revenue_prev_year": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Prev Year",
+            "description": "Выручка за предыдущие 12 месяцев, ₽",
+            "examples": [
+              26000000
+            ]
+          },
+          "monthly_debt_payments": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Debt Payments",
+            "description": "Сколько компания сейчас платит по другим кредитам в месяц, ₽",
+            "examples": [
+              50000
+            ]
+          },
+          "employees": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employees",
+            "description": "Число сотрудников",
+            "examples": [
+              12
+            ]
+          },
+          "collateral_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collateral Description",
+            "description": "Что можно оставить в залог (для INVEST)"
+          },
+          "bki_consent": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bki Consent",
+            "description": "Согласие на запрос кредитной истории"
+          }
+        },
+        "type": "object",
+        "title": "ApplicationPatch",
+        "description": "Частичное обновление черновика: передавайте только изменённые поля."
+      },
+      "CompanyLookupOut": {
+        "properties": {
+          "inn": {
+            "type": "string",
+            "title": "Inn",
+            "examples": [
+              "0010000017"
+            ]
+          },
+          "ogrn": {
+            "type": "string",
+            "title": "Ogrn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "examples": [
+              "ООО «Ромашка-Тест»"
+            ]
+          },
+          "okved": {
+            "type": "string",
+            "title": "Okved",
+            "description": "Основной вид деятельности (код ОКВЭД и название)"
+          },
+          "registered_at": {
+            "type": "string",
+            "format": "date",
+            "title": "Registered At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "active — действует, liquidating — ликвидируется, bankrupt — банкротство"
+          },
+          "director": {
+            "type": "string",
+            "title": "Director"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inn",
+          "ogrn",
+          "name",
+          "okved",
+          "registered_at",
+          "status",
+          "director"
+        ],
+        "title": "CompanyLookupOut"
+      },
+      "CompanyOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "inn": {
+            "type": "string",
+            "title": "Inn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "okved": {
+            "type": "string",
+            "title": "Okved"
+          },
+          "registered_at": {
+            "type": "string",
+            "format": "date",
+            "title": "Registered At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "director": {
+            "type": "string",
+            "title": "Director"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "inn",
+          "name",
+          "okved",
+          "registered_at",
+          "status",
+          "director"
+        ],
+        "title": "CompanyOut"
+      },
+      "DecisionOut": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "title": "Type",
+            "description": "approve — одобрено, counter — контрпредложение, info — нужны документы, reject — отказ"
+          },
+          "amount": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "term": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Term"
+          },
+          "rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate",
+            "description": "Ставка, % годовых"
+          },
+          "monthly_payment": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Payment"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons",
+            "description": "Понятные причины и советы"
+          },
+          "made_by": {
+            "type": "string",
+            "title": "Made By",
+            "description": "auto — система, analyst — специалист"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "reasons",
+          "made_by",
+          "created_at"
+        ],
+        "title": "DecisionOut"
+      },
+      "DemoAccount": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "role",
+          "description"
+        ],
+        "title": "DemoAccount"
+      },
+      "DocumentRequestOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "doc_type": {
+            "type": "string",
+            "title": "Doc Type",
+            "examples": [
+              "bank_statement"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Название документа для клиента"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "requested — ждём загрузки, uploaded — загружен"
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "doc_type",
+          "title",
+          "status"
+        ],
+        "title": "DocumentRequestOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HistoryItem": {
+        "properties": {
+          "from_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AppStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "to_status": {
+            "$ref": "#/components/schemas/AppStatus"
+          },
+          "to_label": {
+            "type": "string",
+            "title": "To Label"
+          },
+          "actor_type": {
+            "$ref": "#/components/schemas/ActorType"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_status",
+          "to_status",
+          "to_label",
+          "actor_type",
+          "comment",
+          "created_at"
+        ],
+        "title": "HistoryItem"
+      },
+      "LoginIn": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "description": "Email пользователя",
+            "examples": [
+              "client1@demo.local"
+            ]
+          },
+          "password": {
+            "type": "string",
+            "title": "Password",
+            "description": "Пароль",
+            "examples": [
+              "demo12345"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginIn"
+      },
+      "MetaOut": {
+        "properties": {
+          "demo_mode": {
+            "type": "boolean",
+            "title": "Demo Mode",
+            "description": "Показывать ли подсказку с тестовыми аккаунтами"
+          },
+          "demo_accounts": {
+            "items": {
+              "$ref": "#/components/schemas/DemoAccount"
+            },
+            "type": "array",
+            "title": "Demo Accounts"
+          },
+          "demo_password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demo Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "demo_mode"
+        ],
+        "title": "MetaOut"
+      },
+      "NextActionOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Какой блок показать клиенту: fill_draft, wait, upload_documents, review_offer, sign, done, rejected, cancelled",
+            "examples": [
+              "wait"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Что происходит",
+            "examples": [
+              "Проверяем данные компании"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "wait_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wait Text",
+            "description": "Сколько ждать",
+            "examples": [
+              "1–2 минуты"
+            ]
+          },
+          "action_required": {
+            "type": "boolean",
+            "title": "Action Required",
+            "description": "Нужно ли действие клиента"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "title",
+          "description",
+          "wait_text",
+          "action_required"
+        ],
+        "title": "NextActionOut"
+      },
+      "ProductOption": {
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ProductOut"
+          },
+          "fits": {
+            "type": "boolean",
+            "title": "Fits",
+            "description": "Укладываются ли сумма и срок в условия продукта"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason",
+            "description": "Почему этот продукт — простыми словами"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount",
+            "description": "Сумма для расчёта (подогнана под лимиты, если fits=false)"
+          },
+          "term_months": {
+            "type": "integer",
+            "title": "Term Months"
+          },
+          "rate_from": {
+            "type": "number",
+            "title": "Rate From",
+            "description": "Ставка «от», % годовых"
+          },
+          "monthly_payment_from": {
+            "type": "integer",
+            "title": "Monthly Payment From",
+            "description": "Примерный ежемесячный платёж, ₽"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product",
+          "fits",
+          "reason",
+          "amount",
+          "term_months",
+          "rate_from",
+          "monthly_payment_from"
+        ],
+        "title": "ProductOption"
+      },
+      "ProductOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "examples": [
+              "EXPRESS"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "title": "Name",
+            "examples": [
+              "Экспресс-кредит"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "min_amount": {
+            "type": "integer",
+            "title": "Min Amount",
+            "examples": [
+              100000
+            ]
+          },
+          "max_amount": {
+            "type": "integer",
+            "title": "Max Amount",
+            "examples": [
+              3000000
+            ]
+          },
+          "min_term": {
+            "type": "integer",
+            "title": "Min Term",
+            "description": "Минимальный срок, мес.",
+            "examples": [
+              3
+            ]
+          },
+          "max_term": {
+            "type": "integer",
+            "title": "Max Term",
+            "description": "Максимальный срок, мес.",
+            "examples": [
+              24
+            ]
+          },
+          "needs_collateral": {
+            "type": "boolean",
+            "title": "Needs Collateral",
+            "description": "Нужен ли залог"
+          },
+          "base_rate": {
+            "type": "number",
+            "title": "Base Rate",
+            "description": "Базовая ставка, % годовых",
+            "examples": [
+              24.0
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "description",
+          "min_amount",
+          "max_amount",
+          "min_term",
+          "max_term",
+          "needs_collateral",
+          "base_rate"
+        ],
+        "title": "ProductOut"
+      },
+      "Purpose": {
+        "type": "string",
+        "enum": [
+          "stock_salary",
+          "equipment",
+          "urgent"
+        ],
+        "title": "Purpose"
+      },
+      "RecommendIn": {
+        "properties": {
+          "purpose": {
+            "$ref": "#/components/schemas/Purpose",
+            "description": "На что нужны деньги: stock_salary — товар и зарплаты, equipment — оборудование и развитие, urgent — срочно закрыть кассовый разрыв",
+            "examples": [
+              "urgent"
+            ]
+          },
+          "amount": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "description": "Желаемая сумма, ₽",
+            "examples": [
+              2000000
+            ]
+          },
+          "term_months": {
+            "type": "integer",
+            "maximum": 120.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Term Months",
+            "description": "Желаемый срок, мес.",
+            "examples": [
+              12
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "purpose",
+          "amount",
+          "term_months"
+        ],
+        "title": "RecommendIn"
+      },
+      "RecommendOut": {
+        "properties": {
+          "recommended": {
+            "$ref": "#/components/schemas/ProductOption"
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/ProductOption"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recommended",
+          "alternatives"
+        ],
+        "title": "RecommendOut"
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "client",
+          "analyst"
+        ],
+        "title": "Role"
+      },
+      "SignIn": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code",
+            "description": "Код подтверждения с экрана",
+            "examples": [
+              "482915"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "SignIn"
+      },
+      "UserOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "examples": [
+              "client1@demo.local"
+            ]
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role",
+            "description": "client — клиент, analyst — специалист банка"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name",
+            "examples": [
+              "Анна Иванова"
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "role",
+          "full_name"
+        ],
+        "title": "UserOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
