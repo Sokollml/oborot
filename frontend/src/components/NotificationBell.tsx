@@ -24,7 +24,7 @@ export function NotificationBell({ linkPrefix }: { linkPrefix: string }) {
           </ActionIcon>
         </Indicator>
       </Popover.Target>
-      <Popover.Dropdown p={0}>
+      <Popover.Dropdown p={0} style={{ maxWidth: 'calc(100vw - 16px)' }}>
         <Group justify="space-between" px="md" py="sm">
           <Text fw={600}>Уведомления</Text>
           {unread > 0 && (

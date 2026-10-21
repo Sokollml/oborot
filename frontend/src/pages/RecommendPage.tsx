@@ -204,7 +204,7 @@ function ProductCard({ option, recommended, onApply }: { option: ProductOption; 
           )}
         </Group>
         <Text size="sm">{option.reason}</Text>
-        <SimpleGrid cols={3} spacing="xs">
+        <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="xs">
           <Fact label="Сумма" value={rub(option.amount)} />
           <Fact label="Срок" value={months(option.term_months)} />
           <Fact label={<Term k="rate">Ставка</Term>} value={`от ${rate(option.rate_from)}`} />

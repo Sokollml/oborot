@@ -38,7 +38,7 @@ export function ClientSection({ card }: { card: AnalystCard }) {
   const a = card.application;
   return (
     <Section title="Клиент и заявка">
-      <SimpleGrid cols={2} spacing="xl">
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
         <Stack gap={6}>
           <Text fw={700}>{a.company.name}</Text>
           <Row label={<Term k="inn">ИНН</Term>} value={a.company.inn} />
@@ -114,7 +114,7 @@ export function ChecksSection({ checks }: { checks: CheckOut[] }) {
           Проверки ещё не проводились.
         </Text>
       ) : (
-        <SimpleGrid cols={2} spacing="sm">
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
           {checks.map((c) => (
             <CheckCard key={c.source} check={c} />
           ))}

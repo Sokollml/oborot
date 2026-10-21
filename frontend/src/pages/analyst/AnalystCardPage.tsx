@@ -52,7 +52,7 @@ export function AnalystCardPage() {
           </Stack>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 5 }}>
-          <Box style={{ position: 'sticky', top: 84 }}>
+          <Box className="sticky-desktop" style={{ position: 'sticky', top: 84 }}>
             <Stack gap="lg">
               <RecommendationCard card={card} onUse={() => setPreset((n) => n + 1)} />
               <DecisionPanel card={card} preset={preset} />

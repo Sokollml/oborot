@@ -114,3 +114,38 @@ h1, h2, h3, h4 {
 .app-navlink[data-active] .mantine-NavLink-section {
   color: var(--mantine-color-accent-6);
 }
+
+/* ---------- Мобильная версия (уже 768 px) ---------- */
+
+/* Нижняя панель вкладок */
+.app-tabbar {
+  background: #ffffff;
+  border-top: none !important;
+  box-shadow: 0 -1px 0 #ebedef;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.app-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #828b96;
+}
+.app-tab[data-active] {
+  color: var(--mantine-color-accent-6);
+}
+
+@media (max-width: 47.99em) {
+  h1, .mantine-Title-root[data-order='1'] { font-size: 30px !important; }
+  h2, .mantine-Title-root[data-order='2'] { font-size: 24px !important; }
+  h3, .mantine-Title-root[data-order='3'] { font-size: 19px !important; }
+
+  /* Карточки компактнее */
+  .mantine-Paper-root[data-mobile-compact] { padding: var(--mantine-spacing-md) !important; }
+
+  /* Поля ввода 16 px — иначе iOS увеличивает страницу при фокусе */
+  .mantine-Input-input { font-size: 16px; }
+
+  /* Блоки, которые на телефоне не должны «липнуть» при прокрутке */
+  .sticky-desktop { position: static !important; }
+}

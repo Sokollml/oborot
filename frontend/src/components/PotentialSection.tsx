@@ -1,7 +1,7 @@
 // Блок «Предодобренные лимиты» на главной клиента.
 // Одно согласие → лимиты по всем компаниям сразу; сверху — лучшее предложение крупным баннером,
 // ниже — компактный список по компаниям с подробностями.
-import { Badge, Button, Checkbox, Group, Modal, Paper, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
+import { Badge, Button, Checkbox, Flex, Group, Modal, Paper, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconSparkles } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -11,6 +11,7 @@ import { api, errorText } from '../api/client';
 import type { MyCompany } from '../api/types';
 import { ago, rub } from '../lib/format';
 import { Term } from '../lib/glossary';
+import { useIsMobile } from '../lib/responsive';
 import { PotentialCard } from './PotentialCard';
 
 const PURPOSE_BY_PRODUCT: Record<string, string> = { EXPRESS: 'urgent', WORKING: 'stock_salary' };
@@ -41,6 +42,7 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
   const navigate = useNavigate();
   const [consent, setConsent] = useState(false);
   const [details, setDetails] = useState<MyCompany | null>(null);
+  const mobile = useIsMobile();
 
   const calculated = companies.filter((c) => c.potential);
   const ok = calculated.filter((c) => c.potential?.status === 'ok');
@@ -50,8 +52,8 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
   // Ещё ничего не считали — один призыв с согласием.
   if (calculated.length === 0) {
     return (
-      <Paper p="xl" className="hero-dark">
-        <Group justify="space-between" align="center" wrap="nowrap" gap="xl">
+      <Paper p={{ base: 'lg', sm: 'xl' }} className="hero-dark">
+        <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align={{ base: 'stretch', sm: 'center' }} gap="lg">
           <Stack gap="xs" maw={620}>
             <Group gap="xs">
               <ThemeIcon size={28} radius="md" color="accent">
@@ -84,7 +86,7 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
           <Button size="lg" disabled={!consent} loading={calcAll.isPending} onClick={() => calcAll.mutate(companies.map((c) => c.id))}>
             Рассчитать лимиты
           </Button>
-        </Group>
+        </Flex>
       </Paper>
     );
   }
@@ -92,8 +94,8 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
   return (
     <Stack gap="md">
       {best && bestOffer && (
-        <Paper p="xl" className="hero-dark">
-          <Group justify="space-between" align="center" wrap="nowrap">
+        <Paper p={{ base: 'lg', sm: 'xl' }} className="hero-dark">
+          <Flex direction={{ base: 'column', sm: 'row' }} justify="space-between" align={{ base: 'stretch', sm: 'center' }} gap="md">
             <div>
               <Text c="gray.4" size="sm" fw={600}>
                 {best.name} · <Term k="potential">предодобрено</Term>
@@ -116,12 +118,12 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
             >
               Оформить
             </Button>
-          </Group>
+          </Flex>
         </Paper>
       )}
 
       <Paper p={0} style={{ overflow: 'hidden' }}>
-        <Group justify="space-between" px="xl" pt="lg" pb="xs">
+        <Group justify="space-between" px={mobile ? 'md' : 'xl'} pt="lg" pb="xs">
           <Title order={4}>Лимиты по компаниям</Title>
           <Button
             variant="subtle"
@@ -133,7 +135,7 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
             Пересчитать все
           </Button>
         </Group>
-        <Table verticalSpacing="sm" horizontalSpacing="xl" highlightOnHover>
+        <Table verticalSpacing="sm" horizontalSpacing={mobile ? 'md' : 'xl'} highlightOnHover>
           <Table.Tbody>
             {companies.map((c) => (
               <Table.Tr key={c.id} style={{ cursor: 'pointer' }} onClick={() => setDetails(c)}>
@@ -144,10 +146,10 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
                   </Text>
                 </Table.Td>
                 <Table.Td>{shortStatus(c)}</Table.Td>
-                <Table.Td c="dimmed" fz="xs">
+                <Table.Td c="dimmed" fz="xs" visibleFrom="sm">
                   {c.potential?.calculated_at ? `рассчитано ${ago(c.potential.calculated_at)}` : ''}
                 </Table.Td>
-                <Table.Td ta="right">
+                <Table.Td ta="right" visibleFrom="sm">
                   <Button variant="default" size="compact-sm">
                     Подробнее
                   </Button>
@@ -158,7 +160,7 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
         </Table>
       </Paper>
 
-      <Modal opened={details !== null} onClose={() => setDetails(null)} size="lg" centered withCloseButton title={<b>Предодобренный лимит</b>}>
+      <Modal opened={details !== null} onClose={() => setDetails(null)} size="lg" centered fullScreen={mobile} withCloseButton title={<b>Предодобренный лимит</b>}>
         {details && <PotentialCard company={companies.find((c) => c.id === details.id) ?? details} />}
       </Modal>
     </Stack>

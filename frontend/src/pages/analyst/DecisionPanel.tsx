@@ -9,6 +9,7 @@ import { useAnalystDecision } from '../../api/queries';
 import type { AnalystCard } from '../../api/types';
 import { annuity, months, rate as fmtRate, rub } from '../../lib/format';
 import { Term } from '../../lib/glossary';
+import { useIsMobile } from '../../lib/responsive';
 import { DOC_TYPES } from '../../lib/statuses';
 
 type Mode = 'approve' | 'change' | 'request_docs' | 'reject';
@@ -58,6 +59,7 @@ export function DecisionPanel({ card, preset }: { card: AnalystCard; preset: num
   const actions = card.available_actions;
   const decision = useAnalystDecision(app.id);
   const rec = card.recommendation;
+  const mobile = useIsMobile();
 
   const defaultRate = rec.rate ?? app.product.base_rate;
   const [mode, setMode] = useState<Mode>('approve');
@@ -133,7 +135,7 @@ export function DecisionPanel({ card, preset }: { card: AnalystCard; preset: num
             Клиент ещё не принял предложение — условия можно изменить или отозвать.
           </Text>
         )}
-        <SegmentedControl fullWidth value={current} onChange={(v) => setMode(v as Mode)} data={modes} radius="md" />
+        <SegmentedControl fullWidth value={current} onChange={(v) => setMode(v as Mode)} data={modes} radius="md" orientation={mobile ? 'vertical' : 'horizontal'} />
 
         {current === 'approve' && (
           <Paper bg="gray.0" p="md" radius="lg">
@@ -144,7 +146,7 @@ export function DecisionPanel({ card, preset }: { card: AnalystCard; preset: num
         )}
 
         {current === 'change' && (
-          <SimpleGrid cols={3} spacing="sm" className="on-gray">
+          <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="sm" className="on-gray">
             <NumberInput label="Сумма" value={amount} onChange={(v) => setAmount(Number(v) || 0)} thousandSeparator=" " suffix=" ₽" hideControls step={50_000} />
             <NumberInput label="Срок, мес." value={term} onChange={(v) => setTerm(Number(v) || 0)} min={app.product.min_term} max={app.product.max_term} />
             <NumberInput label={<Term k="rate">Ставка, %</Term>} value={rateValue} onChange={(v) => setRateValue(Number(v) || 0)} decimalScale={1} step={0.5} min={1} max={60} />

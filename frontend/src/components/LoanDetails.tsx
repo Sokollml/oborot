@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react';
 import type { Application } from '../api/types';
 import { date, months, rate, rub } from '../lib/format';
 import { Term } from '../lib/glossary';
+import { useIsMobile } from '../lib/responsive';
 import { buildSchedule, totalInterest } from '../lib/schedule';
 import { PURPOSE_TITLE } from '../lib/statuses';
 
@@ -19,13 +20,13 @@ export function ScheduleTable({ app, start }: { app: Application; start: Date })
   const rows = useSchedule(app, start);
   return (
     <Stack>
-      <SimpleGrid cols={3}>
+      <SimpleGrid cols={{ base: 1, xs: 3 }}>
         <Fact label="Платёж в месяц" value={rub(rows[0]?.payment)} />
         <Fact label="Переплата за весь срок" value={rub(totalInterest(rows))} />
         <Fact label="Всего к возврату" value={rub((app.decision?.amount ?? 0) + totalInterest(rows))} />
       </SimpleGrid>
       <ScrollArea.Autosize mah={420}>
-        <Table striped verticalSpacing={6} fz="sm" stickyHeader>
+        <Table striped verticalSpacing={6} fz="sm" stickyHeader miw={560}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>№</Table.Th>
@@ -112,6 +113,7 @@ export function Conditions({ app }: { app: Application }) {
 /** Кнопки «График платежей» и «Условия кредита» с модальными окнами. */
 export function LoanDetailsButtons({ app, start }: { app: Application; start?: Date }) {
   const [open, setOpen] = useState<'schedule' | 'conditions' | null>(null);
+  const mobile = useIsMobile();
   const startDate = useMemo(() => start ?? new Date(), [start]);
   if (!app.decision?.amount) return null;
   return (
@@ -124,10 +126,10 @@ export function LoanDetailsButtons({ app, start }: { app: Application; start?: D
           Условия кредита
         </Button>
       </Group>
-      <Modal opened={open === 'schedule'} onClose={() => setOpen(null)} title={<b>График платежей</b>} size="xl" centered>
+      <Modal opened={open === 'schedule'} onClose={() => setOpen(null)} title={<b>График платежей</b>} size="xl" centered fullScreen={mobile}>
         <ScheduleTable app={app} start={startDate} />
       </Modal>
-      <Modal opened={open === 'conditions'} onClose={() => setOpen(null)} title={<b>Основные условия кредита</b>} size="lg" centered>
+      <Modal opened={open === 'conditions'} onClose={() => setOpen(null)} title={<b>Основные условия кредита</b>} size="lg" centered fullScreen={mobile}>
         <Conditions app={app} />
       </Modal>
     </>
@@ -189,6 +191,7 @@ function Pledge({ app }: { app: Application }) {
 export function SigningDocuments({ app, onReadChange }: { app: Application; onReadChange: (read: boolean) => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const [read, setRead] = useState(false);
+  const mobile = useIsMobile();
   const start = useMemo(() => new Date(), []);
   const docs: { key: string; title: string; body: ReactNode }[] = [
     { key: 'contract', title: 'Кредитный договор — индивидуальные условия', body: <Conditions app={app} /> },
@@ -229,7 +232,7 @@ export function SigningDocuments({ app, onReadChange }: { app: Application; onRe
         }}
         label="Я ознакомился с документами и согласен с условиями"
       />
-      <Modal opened={current !== undefined} onClose={() => setOpen(null)} title={<b>{current?.title}</b>} size="xl" centered>
+      <Modal opened={current !== undefined} onClose={() => setOpen(null)} title={<b>{current?.title}</b>} size="xl" centered fullScreen={mobile}>
         {current?.body}
       </Modal>
     </Stack>

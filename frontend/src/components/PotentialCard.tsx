@@ -146,7 +146,7 @@ export function PotentialCard({ company }: { company: MyCompany }) {
               </Group>
             </Anchor>
             <Collapse expanded={details}>
-              <SimpleGrid cols={2} spacing="md">
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                 <div>
                   <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={4}>
                     Помогло

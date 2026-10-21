@@ -8,6 +8,7 @@ import { EmptyState, ErrorState, Loading } from '../../components/StateViews';
 import { StatusBadge } from '../../components/StatusBadge';
 import { months, rub, waiting } from '../../lib/format';
 import { Term } from '../../lib/glossary';
+import { useIsMobile } from '../../lib/responsive';
 import { RISK_COLOR } from '../../lib/statuses';
 
 export function RiskBadge({ cls, score }: { cls: string | null | undefined; score?: number | null }) {
@@ -33,6 +34,7 @@ export function QueuePage() {
   const { data, isPending, error, refetch } = useAnalystQueue(view, product);
   const { data: products } = useProducts();
   const navigate = useNavigate();
+  const mobile = useIsMobile();
 
   return (
     <Stack gap="lg">
@@ -41,12 +43,13 @@ export function QueuePage() {
         <Text c="dimmed">Сверху — те, что ждут дольше всех. Список обновляется сам.</Text>
       </div>
 
-      <Group justify="space-between">
+      <Group justify="space-between" gap="sm">
         <SegmentedControl
           value={view}
           onChange={(v) => setView(v as QueueView)}
           radius="md"
-          size="md"
+          size={mobile ? 'sm' : 'md'}
+          fullWidth={mobile}
           data={[
             { value: 'mine', label: 'Ждут меня' },
             { value: 'active', label: 'Все в работе' },
@@ -59,7 +62,7 @@ export function QueuePage() {
           value={product}
           onChange={setProduct}
           data={(products ?? []).map((p) => ({ value: p.code, label: p.name }))}
-          w={260}
+          w={{ base: '100%', sm: 260 }}
         />
       </Group>
 
@@ -71,7 +74,37 @@ export function QueuePage() {
           text={view === 'mine' ? 'Сейчас нет заявок, которые ждут вашего решения. Новые появятся здесь сами.' : 'По выбранным фильтрам заявок нет.'}
         />
       )}
-      {data && data.length > 0 && (
+      {/* На телефоне — карточки вместо широкой таблицы */}
+      {data && data.length > 0 && mobile && (
+        <Stack gap="sm">
+          {data.map((q) => (
+            <Paper key={q.id} p="md" onClick={() => navigate(`/analyst/applications/${q.id}`)} style={{ cursor: 'pointer' }}>
+              <Group justify="space-between" wrap="nowrap" mb={4}>
+                <Text fw={700} truncate>
+                  {q.company_name}
+                </Text>
+                <RiskBadge cls={q.risk_class} score={q.total_score} />
+              </Group>
+              <Text size="sm" c="dimmed">
+                №{q.id} · {q.product_name}
+              </Text>
+              <Text fw={800} mt={4}>
+                {rub(q.amount)}{' '}
+                <Text span size="sm" c="dimmed" fw={400}>
+                  на {months(q.term_months)}
+                </Text>
+              </Text>
+              <Group justify="space-between" mt="xs">
+                <StatusBadge status={q.status} label={q.status_label} />
+                <Text size="xs" c="dimmed">
+                  ждёт {waiting(q.waiting_since)}
+                </Text>
+              </Group>
+            </Paper>
+          ))}
+        </Stack>
+      )}
+      {data && data.length > 0 && !mobile && (
         <Paper p={0} style={{ overflow: 'hidden' }}>
           <Table highlightOnHover verticalSpacing="md" horizontalSpacing="lg">
             <Table.Thead>

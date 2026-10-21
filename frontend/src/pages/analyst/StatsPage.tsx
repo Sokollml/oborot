@@ -79,7 +79,7 @@ export function StatsPage() {
         <Text c="dimmed">Насколько быстро клиент получает ответ и сколько решений система принимает сама. Обновляется каждые 10 секунд.</Text>
       </div>
 
-      <SimpleGrid cols={4}>
+      <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }}>
         <Tile
           label="Решено без специалиста"
           value={s.auto_share == null ? '—' : `${s.auto_share}%`}
@@ -98,7 +98,7 @@ export function StatsPage() {
         />
       </SimpleGrid>
 
-      <SimpleGrid cols={2} spacing="lg">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
         <Paper p="xl">
           <Title order={4} mb="md">
             Воронка: от заявки до денег

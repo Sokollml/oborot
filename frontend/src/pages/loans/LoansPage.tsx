@@ -22,7 +22,7 @@ export function LoansPage() {
       )}
       {data?.map((loan) => (
         <Paper key={loan.id} p="xl">
-          <Group justify="space-between" align="flex-start" mb="md">
+          <Group justify="space-between" align="flex-start" mb="md" gap="xs">
             <div>
               <Title order={3}>{loan.product.name}</Title>
               <Text c="dimmed" size="sm">
@@ -32,11 +32,11 @@ export function LoansPage() {
                 </Text>
               </Text>
             </div>
-            <Text fz={28} fw={800}>
+            <Text fz={{ base: 22, sm: 28 }} fw={800}>
               {rub(loan.decision?.amount)}
             </Text>
           </Group>
-          <SimpleGrid cols={4} spacing="sm" mb="md">
+          <SimpleGrid cols={{ base: 2, md: 4 }} spacing="sm" mb="md">
             <Cell label="Ближайший платёж" value={nextPaymentDate(loan.updated_at)} />
             <Cell label="Сумма платежа" value={rub(loan.decision?.monthly_payment)} accent />
             <Cell label="Срок" value={months(loan.decision?.term)} />

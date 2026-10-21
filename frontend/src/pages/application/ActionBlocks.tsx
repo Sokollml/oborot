@@ -219,7 +219,7 @@ export function DoneBlock({ app }: { app: Application }) {
           <Text c="dimmed">на расчётном счёте {app.company.name}</Text>
         </div>
       </Group>
-      <SimpleGrid cols={3} spacing="sm">
+      <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="sm">
         <Big label="Ближайший платёж" value={nextPaymentDate(app.updated_at)} />
         <Big label="Сумма платежа" value={rub(d?.monthly_payment)} accent />
         <Big label="Остаток долга" value={rub(d?.amount)} />

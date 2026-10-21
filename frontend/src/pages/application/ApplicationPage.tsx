@@ -49,13 +49,13 @@ export function ApplicationPage() {
       </Group>
 
       <Grid gap="lg">
-        <Grid.Col span={{ base: 12, md: 5 }}>
+        <Grid.Col span={{ base: 12, md: 5 }} order={{ base: 2, md: 1 }}>
           <Stack>
             {history ? <StageTimeline app={app} history={history} /> : <Loading />}
             <Details app={app} />
           </Stack>
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 7 }}>
+        <Grid.Col span={{ base: 12, md: 7 }} order={{ base: 1, md: 2 }}>
           <Stack gap="lg">
             <NextActionPanel app={app} />
             <Chat applicationId={app.id} role="client" title="Вопрос по заявке" placeholder="Напишите специалисту…" />
@@ -70,7 +70,7 @@ export function ApplicationPage() {
 function NextActionPanel({ app }: { app: Application }) {
   const na = app.next_action;
   return (
-    <Paper p="xl" className={na.action_required ? 'needs-action' : undefined}>
+    <Paper p={{ base: 'md', sm: 'xl' }} className={na.action_required ? 'needs-action' : undefined}>
       <Stack>
         <Text size="sm" c="dimmed" fw={600} tt="uppercase">
           Что дальше

@@ -44,6 +44,7 @@ import type { Application, CompanyLookup, Product, Purpose } from '../api/types'
 import { ErrorState, Loading } from '../components/StateViews';
 import { annuity, date, months, rate, rub, time } from '../lib/format';
 import { Term } from '../lib/glossary';
+import { useIsMobile } from '../lib/responsive';
 import { PURPOSES, PURPOSE_TITLE } from '../lib/statuses';
 
 const STEPS = ['Компания', 'Финансы', 'Кредит', 'Отправка'];
@@ -123,7 +124,7 @@ function CompanyStep({ onConfirm, creating, createError, initialInn }: { onConfi
           maxLength={12}
           inputMode="numeric"
           error={localError ?? (lookup.error ? errorText(lookup.error) : null)}
-          w={260}
+          w={{ base: '100%', xs: 260 }}
         />
         <Button mt={25} onClick={find} loading={lookup.isPending} variant="light">
           Найти
@@ -258,6 +259,7 @@ function NewApplication() {
   const [search] = useSearchParams();
   const navigate = useNavigate();
   const create = useCreateApplication();
+  const mobile = useIsMobile();
   const purpose = (search.get('purpose') as Purpose | null) ?? 'stock_salary';
 
   return (
@@ -265,10 +267,10 @@ function NewApplication() {
       <Header />
       <Stepper active={0} size="sm" allowNextStepsSelect={false}>
         {STEPS.map((s) => (
-          <Stepper.Step key={s} label={s} />
+          <Stepper.Step key={s} label={mobile ? undefined : s} />
         ))}
       </Stepper>
-      <Paper p="xl">
+      <Paper p={{ base: 'md', sm: 'xl' }}>
         <Title order={4} mb="sm">
           Шаг 1. Ваша компания
         </Title>
@@ -328,6 +330,7 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
   const autosave = useAutosave(app.id, values, getValues);
   const submit = useSubmitApplication(app.id);
   const cancel = useCancelApplication(app.id);
+  const mobile = useIsMobile();
 
   const productCode = useWatch({ control, name: 'product_code' });
   const product = products.find((p) => p.code === productCode) ?? app.product;
@@ -385,11 +388,11 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
 
       <Stepper active={step} onStepClick={(s) => s > 0 && s < step && goto(s)} size="sm" allowNextStepsSelect={false}>
         {STEPS.map((s) => (
-          <Stepper.Step key={s} label={s} />
+          <Stepper.Step key={s} label={mobile ? undefined : s} />
         ))}
       </Stepper>
 
-      <Paper p="xl">
+      <Paper p={{ base: 'md', sm: 'xl' }}>
         <Stack>
           <Group justify="space-between">
             <Text size="sm" c="dimmed">

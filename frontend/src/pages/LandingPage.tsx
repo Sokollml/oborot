@@ -1,6 +1,6 @@
 // Публичная страница продукта: первое, что видит человек без входа. Витрина в духе банковского сайта —
 // предложение, продукты, калькулятор платежа, как это работает, частые вопросы.
-import { Accordion, Box, Button, Container, Group, Paper, SimpleGrid, Slider, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { Accordion, Box, Button, Container, Flex, Group, Paper, SimpleGrid, Slider, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { IconBolt, IconBuildingBank, IconClockHour4, IconFileOff, IconSparkles, IconStairsUp } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { useProducts } from '../api/queries';
 import { annuity, months, rub } from '../lib/format';
 import { Term } from '../lib/glossary';
+import { useIsMobile } from '../lib/responsive';
 
 const STEPS = [
   { title: 'Узнайте лимит', text: 'Клиентам банка считаем предодобренную сумму по оборотам на счёте — без анкеты и документов.' },
@@ -28,6 +29,7 @@ export function LandingPage() {
   const { data: products } = useProducts();
   const [amount, setAmount] = useState(2_000_000);
   const [term, setTerm] = useState(12);
+  const mobile = useIsMobile();
 
   // Калькулятор: самый подходящий беззалоговый продукт по сумме и сроку и платёж по его базовой ставке.
   const calc = useMemo(() => {
@@ -48,7 +50,7 @@ export function LandingPage() {
               <Text fw={800} size="xl">
                 Ступени
               </Text>
-              <Text size="sm" c="dimmed">
+              <Text size="sm" c="dimmed" visibleFrom="sm">
                 · кредиты для бизнеса
               </Text>
             </Group>
@@ -59,11 +61,11 @@ export function LandingPage() {
         </Container>
       </Box>
 
-      <Container size="lg" py={48}>
-        <Stack gap={56}>
+      <Container size="lg" py={{ base: 'md', sm: 48 }}>
+        <Stack gap={mobile ? 32 : 56}>
           {/* Главное предложение */}
-          <Paper p={48} className="hero-dark">
-            <Group justify="space-between" align="flex-end" wrap="nowrap" gap={48}>
+          <Paper p={{ base: 'lg', md: 48 }} className="hero-dark">
+            <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align={{ base: 'stretch', md: 'flex-end' }} gap={{ base: 'lg', md: 48 }}>
               <Stack gap="md" maw={620}>
                 <Group gap="xs">
                   <ThemeIcon size={28} radius="md">
@@ -73,7 +75,7 @@ export function LandingPage() {
                     Для малого бизнеса и ИП
                   </Text>
                 </Group>
-                <Title order={1} c="white" fz={48}>
+                <Title order={1} c="white" fz={{ base: 30, sm: 48 }}>
                   Деньги на бизнес — решение за минуты
                 </Title>
                 <Text c="gray.4" size="lg">
@@ -88,18 +90,18 @@ export function LandingPage() {
                   </Button>
                 </Group>
               </Stack>
-              <SimpleGrid cols={1} spacing="sm" miw={240}>
+              <SimpleGrid cols={1} spacing="sm" miw={{ md: 240 }}>
                 <HeroFact icon={<IconBolt size={18} />} title="до 50 млн ₽" text="три продукта под разные задачи" />
                 <HeroFact icon={<IconClockHour4 size={18} />} title="от 2 минут" text="автоматическое решение" />
                 <HeroFact icon={<IconFileOff size={18} />} title="без документов" text="клиентам банка — по оборотам" />
               </SimpleGrid>
-            </Group>
+            </Flex>
           </Paper>
 
           {/* Продукты */}
           <Stack gap="md">
             <Title order={2}>Кредиты для бизнеса</Title>
-            <SimpleGrid cols={3}>
+            <SimpleGrid cols={{ base: 1, sm: 3 }}>
               {(products ?? []).map((p) => (
                 <Paper key={p.code} p="xl">
                   <Stack gap="xs" h="100%">
@@ -120,8 +122,8 @@ export function LandingPage() {
           </Stack>
 
           {/* Калькулятор */}
-          <Paper p="xl" id="calc">
-            <SimpleGrid cols={2} spacing={48}>
+          <Paper p={{ base: 'lg', sm: 'xl' }} id="calc">
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: "lg", md: 48 }}>
               <Stack gap="lg">
                 <Title order={2}>Рассчитайте платёж</Title>
                 <div>
@@ -148,7 +150,7 @@ export function LandingPage() {
                     <Text size="sm" c="dimmed">
                       Платёж в месяц (<Term k="annuity">равными частями</Term>)
                     </Text>
-                    <Text fz={40} fw={800} lh={1.1}>
+                    <Text fz={{ base: 32, sm: 40 }} fw={800} lh={1.1}>
                       от {rub(calc.payment)}
                     </Text>
                     <Text size="sm" c="dimmed">
@@ -168,7 +170,7 @@ export function LandingPage() {
           {/* Как это работает */}
           <Stack gap="md">
             <Title order={2}>Как это работает</Title>
-            <SimpleGrid cols={4}>
+            <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }}>
               {STEPS.map((s, i) => (
                 <Paper key={s.title} p="xl">
                   <ThemeIcon size={36} radius="xl" variant="light">
@@ -204,8 +206,8 @@ export function LandingPage() {
             </Paper>
           </Stack>
 
-          <Group justify="space-between" c="dimmed">
-            <Group gap={6}>
+          <Group justify="space-between" c="dimmed" gap="xs">
+            <Group gap={6} wrap="nowrap">
               <IconBuildingBank size={16} />
               <Text size="xs">Демо-проект хакатона. Данные, компании и решения синтетические.</Text>
             </Group>
