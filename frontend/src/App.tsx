@@ -1,8 +1,9 @@
-import { Text, Title } from '@mantine/core';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { AppLayout } from './components/AppLayout';
 import { RequireRole } from './components/RequireRole';
+import { AnalystCardPage } from './pages/analyst/AnalystCardPage';
+import { QueuePage } from './pages/analyst/QueuePage';
 import { ApplyPage } from './pages/ApplyPage';
 import { ApplicationPage } from './pages/application/ApplicationPage';
 import { HomePage } from './pages/HomePage';
@@ -29,7 +30,7 @@ export function App() {
         <Route path="/applications/:id" element={<ApplicationPage />} />
       </Route>
 
-      {/* Кабинет специалиста — фаза 4 */}
+      {/* Кабинет специалиста */}
       <Route
         element={
           <RequireRole role="analyst">
@@ -37,15 +38,8 @@ export function App() {
           </RequireRole>
         }
       >
-        <Route
-          path="/analyst/*"
-          element={
-            <>
-              <Title order={2}>Кабинет специалиста</Title>
-              <Text c="dimmed">Скоро здесь появится очередь заявок.</Text>
-            </>
-          }
-        />
+        <Route path="/analyst" element={<QueuePage />} />
+        <Route path="/analyst/applications/:id" element={<AnalystCardPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

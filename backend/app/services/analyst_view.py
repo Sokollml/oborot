@@ -35,7 +35,6 @@ def _check_lines(source: str, p: dict) -> list[CheckLine]:
         return [
             CheckLine(label="Статус", value=STATUS_TEXT.get(p["status"], p["status"]), level="ok" if p["status"] == "active" else "bad"),
             CheckLine(label="Работает", value=f"{age // 12} г. {age % 12} мес.", level="ok" if age >= 12 else "warn" if age >= 6 else "bad"),
-            CheckLine(label="Руководитель", value=p["director"], level="ok"),
         ]
     if source == CheckSource.FNS:
         return [
