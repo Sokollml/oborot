@@ -34,14 +34,12 @@ export function StageTimeline({ app, history }: { app: Application; history: His
   const finished = app.status === 'ISSUED';
   const stopped = app.status === 'REJECTED' || app.status === 'CANCELLED';
 
-  // Когда заявка впервые попала в каждый этап (для «Решения» — последний вход: после документов он повторяется).
-  const enteredAt = STAGES.map((stage, i) => {
-    const entries = history.filter((h) => stage.statuses.includes(h.to_status));
-    return (i === 3 ? entries.at(-1) : entries[0])?.created_at;
-  });
+  // Когда заявка попала в каждый этап. Берём последний вход: после загрузки документов
+  // проверка и оценка проходят ещё раз, и показывать нужно свежее время.
+  const enteredAt = STAGES.map((stage) => history.filter((h) => stage.statuses.includes(h.to_status)).at(-1)?.created_at);
 
   return (
-    <Paper withBorder p="lg" radius="md">
+    <Paper p="xl">
       <Title order={4} mb="md">
         Ход рассмотрения
       </Title>

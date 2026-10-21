@@ -48,7 +48,7 @@ export function LoginPage() {
             Кредит для бизнеса онлайн: подбор, заявка и решение в одном кабинете
           </Text>
 
-          <Paper withBorder shadow="sm" p="xl" radius="md" component="form" onSubmit={onSubmit} noValidate>
+          <Paper shadow="sm" p="xl" component="form" onSubmit={onSubmit} noValidate>
             <Stack>
               <TextInput label="Email" placeholder="you@company.ru" autoComplete="username" {...register('email')} error={formState.errors.email?.message} />
               <PasswordInput label="Пароль" autoComplete="current-password" {...register('password')} error={formState.errors.password?.message} />
@@ -60,7 +60,7 @@ export function LoginPage() {
           </Paper>
 
           {meta?.demo_mode && (
-            <Alert variant="light" color="blue" icon={<IconInfoCircle size={18} />} title="Демо-режим: тестовые аккаунты">
+            <Alert variant="light" color="gray" radius="xl" icon={<IconInfoCircle size={18} />} title="Демо-режим: тестовые аккаунты">
               <Stack gap={6}>
                 {(meta.demo_accounts ?? []).map((a) => (
                   <Group key={a.email} justify="space-between" wrap="nowrap">

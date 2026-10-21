@@ -52,7 +52,7 @@ export function RecommendPage() {
         <Text c="dimmed">Три вопроса — и вы увидите подходящий вариант и примерный платёж. Это ни к чему не обязывает.</Text>
       </div>
 
-      <Paper withBorder p="lg" radius="md">
+      <Paper p="xl">
         <Text fw={600} mb="sm">
           1. На что нужны деньги?
         </Text>
@@ -66,9 +66,9 @@ export function RecommendPage() {
                 onClick={() => setPurpose(p.value)}
                 p="md"
                 style={{
-                  borderRadius: 8,
-                  border: `2px solid ${active ? 'var(--mantine-color-accent-6)' : 'var(--mantine-color-gray-3)'}`,
-                  background: active ? 'var(--mantine-color-accent-0)' : undefined,
+                  borderRadius: 16,
+                  boxShadow: active ? 'inset 0 0 0 2px var(--mantine-color-accent-6)' : undefined,
+                  background: active ? 'var(--mantine-color-accent-0)' : 'var(--mantine-color-gray-0)',
                 }}
                 aria-pressed={active}
               >
@@ -96,7 +96,7 @@ export function RecommendPage() {
       </Paper>
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
-        <Paper withBorder p="lg" radius="md">
+        <Paper p="xl">
           <Text fw={600} mb="sm">
             2. Сколько нужно?
           </Text>
@@ -124,7 +124,7 @@ export function RecommendPage() {
             mb="lg"
           />
         </Paper>
-        <Paper withBorder p="lg" radius="md">
+        <Paper p="xl">
           <Text fw={600} mb="sm">
             3. На какой срок?
           </Text>
@@ -186,7 +186,7 @@ export function RecommendPage() {
 function ProductCard({ option, recommended, onApply }: { option: ProductOption; recommended?: boolean; onApply: (o: ProductOption) => void }) {
   const p = option.product;
   return (
-    <Card withBorder radius="md" padding="lg" style={recommended ? { borderColor: 'var(--mantine-color-accent-6)', borderWidth: 2 } : undefined}>
+    <Card padding="xl" className={recommended ? 'needs-action' : undefined}>
       <Stack gap="sm">
         <Group justify="space-between">
           <Group gap="xs">

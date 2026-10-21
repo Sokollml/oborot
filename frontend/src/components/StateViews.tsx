@@ -38,7 +38,7 @@ export function ErrorState({ error, onRetry, title }: { error: unknown; onRetry?
 
 export function EmptyState({ title, text, action }: { title: string; text: string; action?: ReactNode }) {
   return (
-    <Paper withBorder p="xl" radius="md">
+    <Paper p="xl">
       <Stack align="center" gap="xs" py="md">
         <ThemeIcon size={48} radius="xl" variant="light" color="gray">
           <IconInbox size={26} />

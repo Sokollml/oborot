@@ -66,7 +66,7 @@ export function ApplicationPage() {
 function NextActionPanel({ app }: { app: Application }) {
   const na = app.next_action;
   return (
-    <Paper withBorder p="lg" radius="md" style={na.action_required ? { borderColor: 'var(--mantine-color-yellow-5)', borderWidth: 2 } : undefined}>
+    <Paper p="xl" className={na.action_required ? 'needs-action' : undefined}>
       <Stack>
         <Text size="sm" c="dimmed" fw={600} tt="uppercase">
           Что дальше
@@ -81,7 +81,7 @@ function NextActionPanel({ app }: { app: Application }) {
             label="Нужно ли что-то от вас"
             value={
               na.action_required ? (
-                <Badge color="yellow" variant="filled" tt="none">
+                <Badge color="accent" variant="filled" tt="none">
                   Да, ваше действие
                 </Badge>
               ) : (
@@ -128,7 +128,7 @@ function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: R
 
 function Details({ app }: { app: Application }) {
   return (
-    <Paper withBorder p="lg" radius="md">
+    <Paper p="xl">
       <Group gap={6} mb="xs">
         <IconInfoCircle size={18} />
         <Title order={5}>Данные заявки</Title>

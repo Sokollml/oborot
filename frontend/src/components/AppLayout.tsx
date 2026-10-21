@@ -12,16 +12,16 @@ export function AppLayout() {
   const isAnalyst = user?.role === 'analyst';
 
   return (
-    <AppShell header={{ height: 60 }} bg="gray.0">
-      <AppShell.Header>
+    <AppShell header={{ height: 64 }} bg="gray.0">
+      <AppShell.Header className="app-header">
         <Container size="lg" h="100%">
           <Group h="100%" justify="space-between">
             <UnstyledButton component={Link} to={isAnalyst ? '/analyst' : '/'}>
               <Group gap={8}>
-                <ThemeIcon size={30} radius="md">
+                <ThemeIcon size={34} radius="md">
                   <IconStairsUp size={20} />
                 </ThemeIcon>
-                <Text fw={700} size="lg">
+                <Text fw={800} size="xl" style={{ letterSpacing: "-0.02em" }}>
                   Ступени
                 </Text>
                 {isAnalyst && (

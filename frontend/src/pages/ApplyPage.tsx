@@ -59,7 +59,7 @@ function innError(inn: string): string | null {
 function CompanyCard({ company }: { company: Pick<CompanyLookup, 'name' | 'inn' | 'director' | 'okved' | 'registered_at' | 'status'> & { ogrn?: string } }) {
   const inactive = company.status !== 'active';
   return (
-    <Paper withBorder p="md" radius="md" bg="gray.0">
+    <Paper p="md" radius="lg" bg="gray.0">
       <Stack gap={6}>
         <Group gap="xs">
           <IconBuilding size={20} />
@@ -262,7 +262,7 @@ function NewApplication() {
           <Stepper.Step key={s} label={s} />
         ))}
       </Stepper>
-      <Paper withBorder p="lg" radius="md">
+      <Paper p="xl">
         <Title order={4} mb="sm">
           Шаг 1. Ваша компания
         </Title>
@@ -382,7 +382,7 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
         ))}
       </Stepper>
 
-      <Paper withBorder p="lg" radius="md">
+      <Paper p="xl">
         <Stack>
           <Group justify="space-between">
             <Text size="sm" c="dimmed">
@@ -548,7 +548,7 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
 
 function Summary({ title, onEdit, children }: { title: string; onEdit: (() => void) | null; children: ReactNode }) {
   return (
-    <Paper withBorder p="sm" radius="md">
+    <Paper p="md" radius="lg" bg="gray.0">
       <Group justify="space-between" mb={4}>
         <Text fw={600}>{title}</Text>
         {onEdit && (

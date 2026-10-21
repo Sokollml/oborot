@@ -51,10 +51,10 @@ export function HomePage() {
 function ApplicationCard({ app }: { app: ApplicationListItem }) {
   const target = app.status === 'DRAFT' ? `/applications/${app.id}/edit` : `/applications/${app.id}`;
   return (
-    <Card withBorder radius="md" padding="lg" component={Link} to={target} style={{ borderColor: app.action_required ? 'var(--mantine-color-yellow-5)' : undefined }}>
+    <Card padding="lg" component={Link} to={target} className={app.action_required ? 'hover-card needs-action' : 'hover-card'}>
       <Stack gap="xs">
         <Group justify="space-between" wrap="nowrap">
-          <Text fw={600} truncate>
+          <Text fw={700} size="lg" truncate>
             {app.company_name}
           </Text>
           <StatusBadge status={app.status} label={app.status_label} />
@@ -62,12 +62,12 @@ function ApplicationCard({ app }: { app: ApplicationListItem }) {
         <Text size="sm" c="dimmed">
           Заявка №{app.id} · {app.product_name}
         </Text>
-        <Text size="lg" fw={600}>
+        <Text size="xl" fw={800}>
           {rub(app.amount)} <Text span c="dimmed" size="sm" fw={400}>на {months(app.term_months)}</Text>
         </Text>
         <Group justify="space-between">
           {app.action_required ? (
-            <Badge color="yellow" variant="filled" tt="none">
+            <Badge color="accent" variant="filled" tt="none">
               Нужно ваше действие
             </Badge>
           ) : (
