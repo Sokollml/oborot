@@ -252,6 +252,7 @@ cd frontend && npm run build            # проверка сборки
 
 | Документ | О чём |
 |---|---|
+| [docs/development.md](docs/development.md) | **для разработчиков:** правила, устройство проекта, команды |
 | [docs/scenarios.md](docs/scenarios.md) | тестовые сценарии шаг за шагом |
 | [docs/competitors.md](docs/competitors.md) | похожие продукты банков и что мы взяли |
 | [docs/state-machine.md](docs/state-machine.md) | статусы, переходы, таблица решений |
