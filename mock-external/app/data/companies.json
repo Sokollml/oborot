@@ -1,0 +1,154 @@
+{
+  "_comment": "Синтетические компании. ИНН с кодом региона 00 — такого региона нет, совпадение с реальными компаниями исключено.",
+  "companies": [
+    {
+      "inn": "0010000017",
+      "name": "ООО «Ромашка-Тест»",
+      "ogrn": "1000000000010",
+      "registered_months_ago": 64,
+      "status": "active",
+      "director": "Иванова Анна Сергеевна",
+      "okved": "47.21 — Торговля розничная фруктами и овощами в специализированных магазинах",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 1,
+        "max_overdue_days_2y": 0,
+        "closed_loans_without_overdue": 3
+      },
+      "note": "Сценарий 1: 5 лет, рост, без просрочек → класс A"
+    },
+    {
+      "inn": "001000001006",
+      "name": "ИП Тестов Тест Тестович",
+      "ogrn": "300000000000015",
+      "registered_months_ago": 26,
+      "status": "active",
+      "director": "Тестов Тест Тестович",
+      "okved": "45.20 — Техническое обслуживание и ремонт автотранспортных средств",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 1,
+        "max_overdue_days_2y": 15,
+        "closed_loans_without_overdue": 2
+      },
+      "note": "Сценарий 2: 2 года, просрочка 15 дней → класс B"
+    },
+    {
+      "inn": "0010000024",
+      "name": "ООО «Вектор-Тест»",
+      "ogrn": "1000000000021",
+      "registered_months_ago": 30,
+      "status": "active",
+      "director": "Петров Олег Викторович",
+      "okved": "46.90 — Торговля оптовая неспециализированная",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 3,
+        "max_overdue_days_2y": 0,
+        "closed_loans_without_overdue": 0
+      },
+      "note": "Сценарий 3: высокая долговая нагрузка → класс C"
+    },
+    {
+      "inn": "0010000031",
+      "name": "ООО «Закат-Тест»",
+      "ogrn": "1000000000032",
+      "registered_months_ago": 80,
+      "status": "liquidating",
+      "director": "Сидоров Павел Ильич",
+      "okved": "56.10 — Деятельность ресторанов и услуги по доставке продуктов питания",
+      "fns": {
+        "tax_debt": true,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 0,
+        "max_overdue_days_2y": 0,
+        "closed_loans_without_overdue": 1
+      },
+      "note": "Сценарий 4: в процессе ликвидации → стоп-фактор"
+    },
+    {
+      "inn": "0010000049",
+      "name": "ООО «Техно-Тест»",
+      "ogrn": "1000000000043",
+      "registered_months_ago": 50,
+      "status": "active",
+      "director": "Кузнецова Мария Андреевна",
+      "okved": "25.62 — Обработка металлических изделий механическая",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 1,
+        "max_overdue_days_2y": 0,
+        "closed_loans_without_overdue": 4
+      },
+      "note": "Сценарий 5: инвестиционный кредит → ручное рассмотрение"
+    },
+    {
+      "inn": "0010000056",
+      "name": "ООО «Тишина-Тест»",
+      "ogrn": "1000000000054",
+      "registered_months_ago": 40,
+      "status": "active",
+      "director": "Смирнов Игорь Петрович",
+      "okved": "62.01 — Разработка компьютерного программного обеспечения",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": null,
+      "bki_timeout": true,
+      "note": "Сценарий 6: кредитное бюро не отвечает → ручное рассмотрение"
+    },
+    {
+      "inn": "0010000063",
+      "name": "ООО «Новичок-Тест»",
+      "ogrn": "1000000000065",
+      "registered_months_ago": 4,
+      "status": "active",
+      "director": "Новикова Елена Олеговна",
+      "okved": "96.02 — Предоставление услуг парикмахерскими и салонами красоты",
+      "fns": {
+        "tax_debt": false,
+        "mass_address": false
+      },
+      "bki": {
+        "active_loans": 0,
+        "max_overdue_days_2y": 0,
+        "closed_loans_without_overdue": 0
+      },
+      "note": "Доп.: бизнесу меньше 6 месяцев → стоп-фактор"
+    },
+    {
+      "inn": "0010000070",
+      "name": "ООО «Феникс-Тест»",
+      "ogrn": "1000000000076",
+      "registered_months_ago": 96,
+      "status": "bankrupt",
+      "director": "Волков Денис Аркадьевич",
+      "okved": "41.20 — Строительство жилых и нежилых зданий",
+      "fns": {
+        "tax_debt": true,
+        "mass_address": true
+      },
+      "bki": {
+        "active_loans": 2,
+        "max_overdue_days_2y": 120,
+        "closed_loans_without_overdue": 0
+      },
+      "note": "Доп.: банкротство → стоп-фактор"
+    }
+  ]
+}
