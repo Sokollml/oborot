@@ -24,6 +24,11 @@ package = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = [
+    # TestClient Starlette переходит на httpx2 — это предупреждение библиотеки, не нашего кода
+    "ignore::DeprecationWarning:fastapi.testclient",
+    "ignore:Using `httpx` with `starlette.testclient`",
+]
 
 [dependency-groups]
 dev = [
