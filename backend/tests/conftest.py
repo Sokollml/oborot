@@ -10,6 +10,7 @@
 
 import importlib.util
 import os
+import tempfile
 from pathlib import Path
 
 TEST_DATABASE_URL = os.environ.get(
@@ -20,6 +21,7 @@ os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 os.environ.setdefault("STAGE_DELAY_SECONDS", "0")
 os.environ.setdefault("EXTERNAL_RETRY_PAUSE_SECONDS", "0")
 os.environ["MOCK_DELAY_SECONDS"] = "0"
+os.environ.setdefault("UPLOAD_DIR", tempfile.mkdtemp(prefix="stupeni-uploads-"))
 
 import pytest  # noqa: E402
 from alembic import command  # noqa: E402
