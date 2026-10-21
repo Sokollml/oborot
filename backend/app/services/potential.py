@@ -37,6 +37,15 @@ TIPS = {
     "business_age": "Лимит вырастет, когда бизнесу исполнится год, и ещё раз — после трёх лет",
 }
 
+# Факторы, которые описывают сам бизнес (подходят для объяснения «из чего сложился лимит»).
+DRIVER_CODES = {"business_age", "credit_history", "revenue_trend"}
+# Нейтральные (0 баллов) факторы, которые можно улучшить.
+NEUTRAL_TIPS = {
+    "business_age": "Лимит вырастет, когда бизнесу исполнится год",
+    "credit_history": "Небольшой кредит, погашенный вовремя, создаст кредитную историю — лимит вырастет",
+    "revenue_trend": "Лимит вырастет, когда выручка пойдёт вверх",
+}
+
 
 def _fetch_all(inn: str) -> dict[CheckSource, dict[str, Any]]:
     """Четыре источника параллельно; короткий таймаут — клиент ждёт на экране."""
@@ -123,8 +132,16 @@ def calculate(company: Company, products: list[Product]) -> dict[str, Any]:
     # Из чего сложился лимит и что поможет его увеличить — по факторам на максимальной сумме продукта.
     reference = by_code["WORKING"]
     ref = score(_input(reference.max_amount, POTENTIAL_PRODUCTS["WORKING"], reference.base_rate, data))
-    drivers = [f"{f.title}: {f.value}" for f in sorted(ref.factors, key=lambda f: -f.points) if f.points > 0][:3]
-    tips = [TIPS[f.code] for f in sorted(ref.factors, key=lambda f: f.points) if f.points <= 0 and f.code in TIPS][:3]
+    # «Помогло» — только свойства самого бизнеса; доля кредита в выручке и нагрузка зависят от суммы, а не от клиента.
+    drivers = [f"{f.title}: {f.value}" for f in sorted(ref.factors, key=lambda f: -f.points) if f.points > 0 and f.code in DRIVER_CODES]
+    # «Как увеличить» — то, что тянет вниз, и нейтральные факторы, которые можно улучшить.
+    tips = []
+    for f in sorted(ref.factors, key=lambda f: f.points):
+        if f.points < 0 and f.code in TIPS:
+            tips.append(TIPS[f.code])
+        elif f.points == 0 and f.code in NEUTRAL_TIPS:
+            tips.append(NEUTRAL_TIPS[f.code])
+    tips = tips[:3]
 
     base = {
         "revenue_12m": acc["revenue_12m"],

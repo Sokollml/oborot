@@ -104,3 +104,12 @@ def test_messages_between_client_and_analyst(client1, client2, analyst, db):
 
     assert client2.get(f"/api/applications/{app_id}/messages").status_code == 403
     assert client1.get(f"/api/applications/{app_id}/messages").json()[1]["text"] == "Нет, обороты по счёту видим"
+
+
+def test_potential_tips_are_relevant(client1, db):
+    create_draft(client1)
+    body = potential(client1, company_id(db, "0010000017")).json()["potential"]
+    # У «Ромашки» нет налогового долга и массового адреса — таких советов быть не должно
+    assert not any("налоговой" in t or "адрес" in t for t in body["tips"])
+    assert any("нагрузк" in t for t in body["tips"])  # упирается именно в долговую нагрузку
+    assert not any("Сумма кредита" in d for d in body["drivers"])

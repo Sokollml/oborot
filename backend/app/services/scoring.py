@@ -87,6 +87,8 @@ def _age_text(months: int) -> str:
 
 
 def _pct(value: float) -> str:
+    if abs(value) > 999:
+        return "больше 999%" if value > 0 else "меньше −999%"
     return f"{value:.1f}%".replace(".", ",")
 
 

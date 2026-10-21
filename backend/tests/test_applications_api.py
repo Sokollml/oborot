@@ -122,3 +122,9 @@ def test_notifications(client1, client2):
     assert client2.post(f"/api/notifications/{note_id}/read").status_code == 404  # чужое уведомление
     assert client1.post(f"/api/notifications/{note_id}/read").status_code == 204
     assert client1.get("/api/notifications").json()["unread_count"] == 0
+
+
+def test_implausible_revenue_is_rejected_before_submit(client1):
+    app_id = create_draft(client1, revenue_12m=23)
+    r = submit(client1, app_id)
+    assert r.status_code == 422 and "опечатку" in r.json()["detail"]

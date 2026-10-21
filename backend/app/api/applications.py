@@ -50,6 +50,9 @@ def _rub(value: int) -> str:
     return f"{value:,}".replace(",", " ") + " ₽"
 
 
+MIN_REVENUE = 100_000  # меньше — почти наверняка опечатка (ввели тысячи или миллионы вместо рублей)
+
+
 def _missing_for_submit(app: Application) -> list[str]:
     """Что ещё не заполнено или не подходит под условия продукта — человеческим языком."""
     p = app.product
@@ -64,6 +67,8 @@ def _missing_for_submit(app: Application) -> list[str]:
         problems.append(f"срок для «{p.name}» — от {p.min_term} до {p.max_term} месяцев")
     if not app.revenue_12m:
         problems.append("укажите выручку за последние 12 месяцев")
+    elif app.revenue_12m < MIN_REVENUE:
+        problems.append("выручка похожа на опечатку — укажите сумму в рублях, не меньше 100 000 ₽")
     if app.revenue_prev_year is None:
         problems.append("укажите выручку за предыдущий год")
     if app.monthly_debt_payments is None:
