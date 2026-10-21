@@ -92,6 +92,22 @@ services:
       api:
         condition: service_healthy
 
+  # Публичная ссылка на демо через Cloudflare Quick Tunnel (бесплатно, без аккаунта).
+  # Не запускается по умолчанию — только явно:
+  #   docker compose --profile tunnel up -d tunnel
+  #   docker compose logs tunnel | grep trycloudflare.com
+  # Адрес меняется при каждом перезапуске туннеля.
+  # Сеть хоста — чтобы туннель ходил в интернет тем же путём, что и сама машина (VPN/прокси);
+  # протокол http2 (TCP) — надёжнее QUIC (UDP) за прокси и корпоративными сетями.
+  tunnel:
+    image: cloudflare/cloudflared:2026.9.3
+    profiles: ["tunnel"]
+    network_mode: host
+    command: ["tunnel", "--no-autoupdate", "--protocol", "http2", "--url", "http://localhost:3000"]
+    depends_on:
+      - frontend
+    restart: unless-stopped
+
 volumes:
   pgdata:
   uploads:

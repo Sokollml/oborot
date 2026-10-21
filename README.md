@@ -68,6 +68,16 @@ docker compose up --build
 
 Начать с чистой базы: `docker compose down -v && docker compose up --build`.
 
+**Публичная ссылка на демо** (Cloudflare Quick Tunnel, без аккаунта):
+
+```bash
+docker compose --profile tunnel up -d tunnel
+docker compose logs tunnel | grep trycloudflare.com
+```
+
+Нужен исходящий доступ к Cloudflare на порт 7844 (TCP/UDP). В сетях, где он закрыт (часть провайдеров и VPN-клиентов),
+туннель не подключится — в логах будет `TLS handshake with edge error` или `Allow outbound TCP on port 7844`.
+
 ## Архитектура
 
 ```mermaid
