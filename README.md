@@ -170,7 +170,7 @@ Docker Compose, nginx. Полный список и лицензии — [THIRD_
 
 ```bash
 docker compose up -d db                 # тестам нужна база (порт 5433), БД stupeni_test создаётся сама
-cd backend && uv run pytest             # 127 тестов: скоринг, решения, переходы, 403, идемпотентность, сценарии 1–6
+cd backend && uv run pytest             # 130 тестов: скоринг, решения, переходы, 403, идемпотентность, сценарии 1–6
 cd frontend && npm ci && npm run typecheck   # проверка типов фронтенда
 cd frontend && npm run build            # проверка сборки
 ```
