@@ -1,33 +1,54 @@
-import { useEffect, useState } from 'react';
-import { Badge, Container, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import { Text, Title } from '@mantine/core';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
-type ApiState = 'loading' | 'ok' | 'error';
+import { AppLayout } from './components/AppLayout';
+import { RequireRole } from './components/RequireRole';
+import { ApplyPage } from './pages/ApplyPage';
+import { ApplicationPage } from './pages/application/ApplicationPage';
+import { HomePage } from './pages/HomePage';
+import { LoginPage } from './pages/LoginPage';
+import { RecommendPage } from './pages/RecommendPage';
 
-// Временная стартовая страница фазы 0: показывает, что фронтенд собран,
-// а nginx проксирует /api на бэкенд.
 export function App() {
-  const [api, setApi] = useState<ApiState>('loading');
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((r) => setApi(r.ok ? 'ok' : 'error'))
-      .catch(() => setApi('error'));
-  }, []);
-
   return (
-    <Container size="sm" py={80}>
-      <Paper withBorder p="xl">
-        <Stack gap="sm">
-          <Title order={1}>Ступени</Title>
-          <Text c="dimmed">Финансирование для малого бизнеса — заявка, статус и решение в одном кабинете.</Text>
-          <Group gap="xs">
-            <Text size="sm">Связь с сервером:</Text>
-            {api === 'loading' && <Badge color="gray">проверяем…</Badge>}
-            {api === 'ok' && <Badge color="green">есть</Badge>}
-            {api === 'error' && <Badge color="red">нет связи</Badge>}
-          </Group>
-        </Stack>
-      </Paper>
-    </Container>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+
+      {/* Кабинет клиента */}
+      <Route
+        element={
+          <RequireRole role="client">
+            <AppLayout />
+          </RequireRole>
+        }
+      >
+        <Route path="/" element={<HomePage />} />
+        <Route path="/new" element={<RecommendPage />} />
+        <Route path="/apply" element={<ApplyPage />} />
+        <Route path="/applications/:id/edit" element={<ApplyPage />} />
+        <Route path="/applications/:id" element={<ApplicationPage />} />
+      </Route>
+
+      {/* Кабинет специалиста — фаза 4 */}
+      <Route
+        element={
+          <RequireRole role="analyst">
+            <AppLayout />
+          </RequireRole>
+        }
+      >
+        <Route
+          path="/analyst/*"
+          element={
+            <>
+              <Title order={2}>Кабинет специалиста</Title>
+              <Text c="dimmed">Скоро здесь появится очередь заявок.</Text>
+            </>
+          }
+        />
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
