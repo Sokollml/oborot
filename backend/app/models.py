@@ -149,6 +149,7 @@ class Decision(Base):
     rate: Mapped[float | None] = mapped_column(Float)
     monthly_payment: Mapped[int | None] = mapped_column(BigInteger)
     reasons: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    advice: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list, server_default="[]")
     made_by: Mapped[str] = mapped_column(String(16), nullable=False)
     analyst_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = _created_at()

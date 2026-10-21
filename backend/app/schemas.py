@@ -150,7 +150,8 @@ class DecisionOut(ORM):
     term: int | None = None
     rate: float | None = Field(default=None, description="Ставка, % годовых")
     monthly_payment: int | None = None
-    reasons: list[str] = Field(description="Понятные причины и советы")
+    reasons: list[str] = Field(description="2–3 понятные причины решения")
+    advice: list[str] = Field(description="Совет, что можно сделать (например, «снизьте сумму до …»)")
     made_by: str = Field(description="auto — система, analyst — специалист")
     created_at: datetime
 
