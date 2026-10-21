@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # и частота опроса очереди задач.
     stage_delay_seconds: float = 2.0
     worker_poll_seconds: float = 1.0
+    # «Аренда» задачи: если воркер упал, через столько секунд задачу подхватит другой запуск.
+    job_lease_seconds: int = 60
+    job_max_attempts: int = 3
 
     # Внешние сервисы: таймаут одного запроса, число попыток и пауза между ними.
     external_timeout_seconds: float = 3.0
