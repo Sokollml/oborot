@@ -1568,7 +1568,15 @@
             },
             "type": "array",
             "title": "Reasons",
-            "description": "Понятные причины и советы"
+            "description": "2–3 понятные причины решения"
+          },
+          "advice": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Advice",
+            "description": "Совет, что можно сделать (например, «снизьте сумму до …»)"
           },
           "made_by": {
             "type": "string",
@@ -1585,6 +1593,7 @@
         "required": [
           "type",
           "reasons",
+          "advice",
           "made_by",
           "created_at"
         ],
