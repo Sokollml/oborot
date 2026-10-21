@@ -34,9 +34,20 @@ export function StageTimeline({ app, history }: { app: Application; history: His
   const finished = app.status === 'ISSUED';
   const stopped = app.status === 'REJECTED' || app.status === 'CANCELLED';
 
-  // Когда заявка попала в каждый этап. Берём последний вход: после загрузки документов
-  // проверка и оценка проходят ещё раз, и показывать нужно свежее время.
-  const enteredAt = STAGES.map((stage) => history.filter((h) => stage.statuses.includes(h.to_status)).at(-1)?.created_at);
+  // Когда заявка попала в каждый этап. Идём по истории с конца и для каждого этапа берём начало
+  // ПОСЛЕДНЕГО прохода: после загрузки документов проверка и оценка повторяются, а «Решение»
+  // может состоять из нескольких статусов подряд (специалист → предложение).
+  const enteredAt: (string | undefined)[] = STAGES.map(() => undefined);
+  let runStage = -1;
+  const finishedStages = new Set<number>();
+  for (let i = history.length - 1; i >= 0; i--) {
+    const stage = stageOf(history[i].to_status);
+    if (stage !== runStage) {
+      if (runStage >= 0) finishedStages.add(runStage);
+      runStage = stage;
+    }
+    if (stage >= 0 && !finishedStages.has(stage)) enteredAt[stage] = history[i].created_at;
+  }
 
   return (
     <Paper p="xl">
