@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.enums import ActorType, AppStatus
+from app.enums import ActorType, AppStatus, Role
 from app.errors import Conflict, Forbidden, ValidationFailed
 from app.models import Application, Company, Notification, StatusHistory, User
 
@@ -123,11 +123,15 @@ def transition(
     )
     db.add(entry)
 
-    # 4. Уведомление владельцу заявки.
+    # 4. Уведомление владельцу заявки (и специалистам, если решение теперь за ними).
     text = NOTIFICATION_TEXTS.get(to_status)
     if text:
         owner_id = db.scalar(select(Company.owner_user_id).where(Company.id == application.company_id))
         db.add(Notification(user_id=owner_id, application_id=application.id, text=text.format(id=application.id)))
+    if to_status == S.MANUAL_REVIEW:
+        company = db.scalar(select(Company.name).where(Company.id == application.company_id))
+        for analyst_id in db.scalars(select(User.id).where(User.role == Role.ANALYST)):
+            db.add(Notification(user_id=analyst_id, application_id=application.id, text=f"Заявка №{application.id} ({company}) ждёт вашего решения"))
 
     db.flush()
     return entry

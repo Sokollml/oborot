@@ -6,6 +6,8 @@
 
 from datetime import date, datetime
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.enums import ActorType, AppStatus, Purpose, Role
@@ -229,3 +231,86 @@ class NotificationOut(ORM):
 class NotificationsOut(BaseModel):
     items: list[NotificationOut]
     unread_count: int = Field(description="Сколько непрочитанных — число на колокольчике")
+
+
+# ---------- Кабинет специалиста ----------
+
+
+class QueueItem(BaseModel):
+    id: int
+    company_name: str
+    company_inn: str
+    product_code: str
+    product_name: str
+    amount: int | None
+    term_months: int | None
+    status: AppStatus
+    status_label: str
+    risk_class: str | None = Field(description="Класс риска A–D (нет, если скоринг не проводился)")
+    total_score: int | None
+    waiting_since: datetime = Field(description="Когда заявка попала в текущий статус")
+
+
+class CheckLine(BaseModel):
+    label: str = Field(examples=["Налоговый долг"])
+    value: str = Field(examples=["нет"])
+    level: str = Field(description="ok — хорошо, warn — обратить внимание, bad — плохо", examples=["ok"])
+
+
+class CheckOut(BaseModel):
+    source: str = Field(examples=["bki"])
+    title: str = Field(examples=["Кредитная история (БКИ)"])
+    ok: bool = Field(description="Сервис ответил")
+    level: str = Field(description="Итог проверки: ok / warn / bad")
+    lines: list[CheckLine]
+    fetched_at: datetime
+
+
+class FactorOut(BaseModel):
+    code: str
+    title: str
+    value: str
+    points: int
+    comment: str
+
+
+class ScoringOut(BaseModel):
+    total_score: int
+    risk_class: str
+    base_score: int = Field(description="Стартовый балл, от которого считаются факторы")
+    factors: list[FactorOut]
+    stop_factors: list[FactorOut]
+    model_version: str
+    created_at: datetime
+
+
+class RecommendationOut(BaseModel):
+    action: str = Field(description="approve | counter | request_docs | reject")
+    title: str = Field(examples=["Одобрить на запрошенных условиях"])
+    text: str
+    amount: int | None = None
+    term_months: int | None = None
+    rate: float | None = None
+    monthly_payment: int | None = None
+
+
+class AnalystApplicationOut(BaseModel):
+    application: ApplicationOut
+    checks: list[CheckOut]
+    scoring: ScoringOut | None
+    recommendation: RecommendationOut
+    history: list[HistoryItem]
+    decisions: list[DecisionOut] = Field(description="Все решения по заявке, новые сверху")
+    available_actions: list[str] = Field(description="Что специалист может сделать сейчас: approve, request_docs, reject")
+
+
+class AnalystDecisionIn(BaseModel):
+    action: Literal["approve", "request_docs", "reject"] = Field(
+        description="approve — одобрить (в т.ч. с изменёнными условиями), request_docs — запросить документы, reject — отказать"
+    )
+    amount: int | None = Field(default=None, gt=0, description="Для approve: сумма", examples=[2_000_000])
+    term_months: int | None = Field(default=None, gt=0, description="Для approve: срок, мес.", examples=[12])
+    rate: float | None = Field(default=None, gt=0, le=100, description="Для approve: ставка, % годовых", examples=[24.0])
+    doc_types: list[str] = Field(default_factory=list, description="Для request_docs: какие документы нужны", examples=[["bank_statement"]])
+    client_reason: str | None = Field(default=None, description="Для reject: причина, которую увидит клиент")
+    comment: str = Field(min_length=1, description="Комментарий специалиста — обязателен", examples=["Выручка подтверждена выпиской"])
