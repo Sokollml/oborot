@@ -1,0 +1,31 @@
+[project]
+name = "stupeni-backend"
+version = "0.1.0"
+description = "Ступени — API и воркер кредитного конвейера"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "alembic>=1.20.0",
+    "bcrypt>=5.0.0",
+    "fastapi>=0.157.0",
+    "httpx>=0.28.1",
+    "psycopg[binary]>=3.3.6",
+    "pydantic-settings>=2.16.1",
+    "pyjwt>=2.15.1",
+    "python-multipart>=0.0.32",
+    "pyyaml>=6.0.3",
+    "sqlalchemy>=2.1.5",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[tool.uv]
+# Это приложение, а не библиотека: собирать пакет не нужно.
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
