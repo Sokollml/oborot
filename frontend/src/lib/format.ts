@@ -54,3 +54,13 @@ export function annuity(amount: number, annualRatePct: number, termMonths: numbe
   if (i === 0) return Math.round(amount / termMonths);
   return Math.round((amount * i) / (1 - (1 + i) ** -termMonths));
 }
+
+/** Сколько ждёт: «5 мин», «2 ч», «3 дн». */
+export function waiting(sinceIso: string): string {
+  const s = Math.max(0, (Date.now() - new Date(sinceIso).getTime()) / 1000);
+  if (s < 60) return 'меньше минуты';
+  if (s < 3600) return `${Math.floor(s / 60)} мин`;
+  if (s < 86400) return `${Math.floor(s / 3600)} ч ${Math.floor((s % 3600) / 60)} мин`;
+  const d = Math.floor(s / 86400);
+  return `${d} ${plural(d, 'день', 'дня', 'дней')}`;
+}

@@ -23,3 +23,13 @@ export const PURPOSES: { value: Purpose; title: string; hint: string }[] = [
 ];
 
 export const PURPOSE_TITLE = Object.fromEntries(PURPOSES.map((p) => [p.value, p.title])) as Record<Purpose, string>;
+
+// Документы, которые специалист может запросить (ключи — как на бэкенде, app/views.py DOC_TITLES).
+export const DOC_TYPES = [
+  { value: 'bank_statement', label: 'Выписка по счёту за 12 месяцев' },
+  { value: 'financial_report', label: 'Бухгалтерская отчётность за год' },
+  { value: 'collateral_docs', label: 'Документы на залог' },
+  { value: 'other', label: 'Другой документ' },
+];
+
+export const RISK_COLOR: Record<string, string> = { A: 'green', B: 'teal', C: 'orange', D: 'red' };

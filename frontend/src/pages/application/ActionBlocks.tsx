@@ -1,12 +1,12 @@
 // Блоки «Что дальше» для каждого состояния заявки: предложение, подпись, деньги, отказ, документы.
-import { Alert, Button, Group, List, Modal, Paper, PinInput, SimpleGrid, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
-import { IconBulb, IconCircleCheck, IconFileText, IconX } from '@tabler/icons-react';
+import { Alert, Button, FileButton, Group, List, Modal, Paper, PinInput, SimpleGrid, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
+import { IconBulb, IconCircleCheck, IconFileText, IconUpload, IconX } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { errorText } from '../../api/client';
-import { useAcceptOffer, useCloneApplication, useDeclineOffer, useSign } from '../../api/queries';
+import { useAcceptOffer, useCloneApplication, useDeclineOffer, useSign, useUploadDocument } from '../../api/queries';
 import type { Application } from '../../api/types';
 import { annuity, months, rate, rub } from '../../lib/format';
 import { Term } from '../../lib/glossary';
@@ -271,17 +271,76 @@ export function RejectedBlock({ app }: { app: Application }) {
 
 // ---------- Документы ----------
 
-export function DocumentsBlock({ app }: { app: Application }) {
+const MAX_FILE = 10 * 1024 * 1024;
+const ACCEPT = 'application/pdf,image/jpeg,image/png';
+
+function DocumentRow({ app, doc }: { app: Application; doc: Application['documents'][number] }) {
+  const upload = useUploadDocument(app.id);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const uploaded = doc.status === 'uploaded';
+
+  const pick = (file: File | null) => {
+    setLocalError(null);
+    if (!file) return;
+    // Проверяем сразу в браузере, чтобы не ждать ответа сервера (сервер всё равно проверит ещё раз).
+    if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) return setLocalError('Подходят только PDF, JPG или PNG');
+    if (file.size > MAX_FILE) return setLocalError('Файл больше 10 МБ — сожмите его или загрузите по частям');
+    upload.mutate({ documentRequestId: doc.id, file });
+  };
+
   return (
-    <Stack gap="xs">
-      {app.documents.map((doc) => (
-        <Group key={doc.id} gap="xs" wrap="nowrap">
-          <IconFileText size={18} />
-          <Text size="sm">
-            {doc.doc_type === 'bank_statement' ? <Term k="statement">{doc.title}</Term> : doc.title}
-          </Text>
+    <Paper p="md" radius="lg" bg={uploaded ? '#ebf8ef' : 'gray.0'}>
+      <Group justify="space-between" wrap="nowrap">
+        <Group gap="sm" wrap="nowrap">
+          <ThemeIcon size={36} radius="md" color={uploaded ? 'green' : 'gray'} variant={uploaded ? 'filled' : 'light'}>
+            {uploaded ? <IconCircleCheck size={20} /> : <IconFileText size={20} />}
+          </ThemeIcon>
+          <div>
+            <Text fw={600} size="sm">
+              {doc.doc_type === 'bank_statement' ? <Term k="statement">{doc.title}</Term> : doc.title}
+            </Text>
+            <Text size="xs" c="dimmed">
+              {uploaded ? `Загружен: ${doc.file_name}` : 'PDF, JPG или PNG, до 10 МБ'}
+            </Text>
+          </div>
         </Group>
+        {!uploaded && (
+          <FileButton onChange={pick} accept={ACCEPT}>
+            {(props) => (
+              <Button {...props} leftSection={<IconUpload size={16} />} loading={upload.isPending}>
+                Загрузить
+              </Button>
+            )}
+          </FileButton>
+        )}
+      </Group>
+      {(localError || upload.error) && (
+        <Text size="sm" c="red" mt="xs">
+          {localError ?? errorText(upload.error)}
+        </Text>
+      )}
+    </Paper>
+  );
+}
+
+export function DocumentsBlock({ app }: { app: Application }) {
+  const pending = app.documents.filter((d) => d.status !== 'uploaded');
+  const reason = app.decision?.type === 'info' ? app.decision.reasons[0] : null;
+  return (
+    <Stack gap="sm">
+      {reason && (
+        <Alert color="blue" variant="light" icon={<IconBulb size={18} />}>
+          {reason}
+        </Alert>
+      )}
+      {app.documents.map((doc) => (
+        <DocumentRow key={doc.id} app={app} doc={doc} />
       ))}
+      {pending.length > 0 && app.documents.length > 1 && (
+        <Text size="xs" c="dimmed">
+          Осталось загрузить: {pending.length}. Проверка продолжится сама, как только будут все документы.
+        </Text>
+      )}
     </Stack>
   );
 }

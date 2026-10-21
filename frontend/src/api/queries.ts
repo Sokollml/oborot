@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ApiError, api, newIdempotencyKey } from './client';
 import type {
+  AnalystCard,
+  AnalystDecisionIn,
   Application,
   ApplicationListItem,
   ApplicationPatch,
@@ -14,6 +16,7 @@ import type {
   NotificationsResponse,
   Product,
   Purpose,
+  QueueItem,
   RecommendResult,
   User,
 } from './types';
@@ -192,5 +195,56 @@ export function useMarkAllRead() {
   return useMutation({
     mutationFn: () => api.post<void>('/notifications/read-all'),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
+  });
+}
+
+// ---------- Документы (клиент) ----------
+
+export function useUploadDocument(applicationId: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ documentRequestId, file }: { documentRequestId: number; file: File }) => {
+      const form = new FormData();
+      form.append('document_request_id', String(documentRequestId));
+      form.append('file', file);
+      return api.post<Application>(`/applications/${applicationId}/documents`, form);
+    },
+    onSuccess: (app) => {
+      qc.setQueryData(['application', app.id], app);
+      qc.invalidateQueries({ queryKey: ['applications'] });
+    },
+  });
+}
+
+// ---------- Кабинет специалиста ----------
+
+export type QueueView = 'mine' | 'active' | 'all';
+
+export function useAnalystQueue(view: QueueView, product: string | null) {
+  const params = new URLSearchParams({ view, ...(product ? { product } : {}) });
+  return useQuery({
+    queryKey: ['analyst-queue', view, product],
+    queryFn: () => api.get<QueueItem[]>(`/analyst/queue?${params}`),
+    refetchInterval: 5000, // новые заявки появляются в очереди сами
+    placeholderData: (prev) => prev,
+  });
+}
+
+export function useAnalystCard(id: number) {
+  return useQuery({
+    queryKey: ['analyst-card', id],
+    queryFn: () => api.get<AnalystCard>(`/analyst/applications/${id}`),
+    refetchInterval: 3000, // клиент мог загрузить документы или принять предложение
+  });
+}
+
+export function useAnalystDecision(id: number) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: AnalystDecisionIn) => api.post<AnalystCard>(`/analyst/applications/${id}/decision`, body),
+    onSuccess: (card) => {
+      qc.setQueryData(['analyst-card', id], card);
+      qc.invalidateQueries({ queryKey: ['analyst-queue'] });
+    },
   });
 }
