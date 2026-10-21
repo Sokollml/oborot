@@ -20,6 +20,7 @@ erDiagram
     applications ||--o{ document_requests : "документы"
     applications ||--o{ jobs : "задачи воркера"
     applications ||--o{ notifications : "о заявке"
+    applications ||--o{ application_messages : "переписка"
 
     users {
         int id PK
@@ -38,6 +39,8 @@ erDiagram
         date registered_at
         string status "active | liquidating | bankrupt"
         string director
+        json potential "последний расчёт предодобренного лимита"
+        timestamptz potential_at
     }
     products {
         int id PK
@@ -63,6 +66,7 @@ erDiagram
         int employees
         text collateral_description
         bool bki_consent
+        bool revenue_prefilled "выручка из оборотов по счёту"
         string status "меняется только через transition()"
         string signing_code "симуляция подписи"
         string idempotency_key UK
@@ -124,6 +128,14 @@ erDiagram
         timestamptz read_at
         timestamptz created_at
     }
+    application_messages {
+        int id PK
+        int application_id FK
+        int author_id FK
+        string author_role "client | analyst"
+        text text
+        timestamptz created_at
+    }
     jobs {
         int id PK
         string type "process_application"
@@ -145,6 +157,10 @@ erDiagram
 | `decisions.advice` | советы клиенту хранятся отдельно от причин решения |
 | `document_requests.file_name` | исходное имя файла, чтобы специалист видел, что открывает |
 | `created_at` в нескольких таблицах | время этапов на ленте и сортировка очереди |
+| `companies.potential`, `potential_at` | предодобренный лимит: результат и время последнего расчёта |
+| `applications.revenue_prefilled` | выручка подставлена из оборотов по счёту в банке |
+| `application_messages` | переписка клиента и специалиста по заявке |
+| `check_results.source = account` | обороты по счёту в банке — для сверки с заявленной выручкой |
 
 ## Очередь задач
 

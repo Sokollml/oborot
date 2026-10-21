@@ -108,7 +108,7 @@ function CheckCard({ check }: { check: CheckOut }) {
 
 export function ChecksSection({ checks }: { checks: CheckOut[] }) {
   return (
-    <Section title="Проверки во внешних источниках">
+    <Section title="Проверки">
       {checks.length === 0 ? (
         <Text c="dimmed" size="sm">
           Проверки ещё не проводились.
