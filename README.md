@@ -77,6 +77,13 @@ docker compose logs tunnel | grep trycloudflare.com
 
 Нужен исходящий доступ к Cloudflare на порт 7844 (TCP/UDP). В сетях, где он закрыт (часть провайдеров и VPN-клиентов),
 туннель не подключится — в логах будет `TLS handshake with edge error` или `Allow outbound TCP on port 7844`.
+Запасной вариант без Docker и аккаунта — SSH-туннель localhost.run (ссылка вида `https://….lhr.life` появится в выводе):
+
+```bash
+ssh -R 80:localhost:3000 nokey@localhost.run
+```
+
+По ссылке демо доступно всем, у кого она есть, — с тестовыми аккаунтами. После показа туннель стоит закрыть.
 
 ## Архитектура
 
