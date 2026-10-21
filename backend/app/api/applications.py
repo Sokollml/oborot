@@ -162,6 +162,47 @@ def submit_application(
     return application_out(db, app)
 
 
+@router.post(
+    "/applications/{application_id}/clone",
+    response_model=ApplicationOut,
+    status_code=201,
+    summary="Подать заново с этими данными",
+)
+def clone_application(application_id: int, db: DB, user: ClientUser) -> ApplicationOut:
+    """Новый черновик с копией анкеты. Старая заявка остаётся как есть (для истории)."""
+    old = get_owned_application(db, application_id, user)
+    if old.status not in (AppStatus.REJECTED, AppStatus.CANCELLED):
+        raise Conflict("Подать заново можно после отказа или отмены заявки")
+    app = Application(
+        company_id=old.company_id,
+        product_id=old.product_id,
+        purpose=old.purpose,
+        amount=old.amount,
+        term_months=old.term_months,
+        revenue_12m=old.revenue_12m,
+        revenue_prev_year=old.revenue_prev_year,
+        monthly_debt_payments=old.monthly_debt_payments,
+        employees=old.employees,
+        collateral_description=old.collateral_description,
+        bki_consent=False,  # согласие даётся заново на каждую заявку
+        status=AppStatus.DRAFT,
+    )
+    db.add(app)
+    db.flush()
+    db.add(
+        StatusHistory(
+            application_id=app.id,
+            from_status=None,
+            to_status=AppStatus.DRAFT,
+            actor_type=ActorType.CLIENT,
+            actor_id=user.id,
+            comment=f"Создана на основе заявки №{old.id}",
+        )
+    )
+    db.commit()
+    return application_out(db, app)
+
+
 @router.get("/applications/{application_id}/history", response_model=list[HistoryItem], summary="История статусов")
 def get_history(application_id: int, db: DB, user: ClientUser) -> list[HistoryItem]:
     get_owned_application(db, application_id, user)

@@ -213,3 +213,19 @@ class HistoryItem(ORM):
 
 class SignIn(BaseModel):
     code: str = Field(description="Код подтверждения с экрана", examples=["482915"])
+
+
+# ---------- Уведомления ----------
+
+
+class NotificationOut(ORM):
+    id: int
+    application_id: int | None
+    text: str = Field(examples=["По заявке №12 готово предложение. Посмотрите условия и примите решение."])
+    read_at: datetime | None
+    created_at: datetime
+
+
+class NotificationsOut(BaseModel):
+    items: list[NotificationOut]
+    unread_count: int = Field(description="Сколько непрочитанных — число на колокольчике")

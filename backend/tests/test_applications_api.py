@@ -99,3 +99,26 @@ def test_requires_login():
     from app.main import app
 
     assert TestClient(app).get("/api/applications").status_code == 401
+
+
+def test_clone_after_cancel_copies_form(client1):
+    app_id = create_draft(client1, amount=1_500_000)
+    assert client1.post(f"/api/applications/{app_id}/clone").status_code == 409  # черновик клонировать незачем
+    client1.post(f"/api/applications/{app_id}/cancel")
+    r = client1.post(f"/api/applications/{app_id}/clone")
+    assert r.status_code == 201
+    new = r.json()
+    assert new["id"] != app_id and new["status"] == "DRAFT"
+    assert new["amount"] == 1_500_000 and new["revenue_12m"] == 30_000_000
+    assert new["bki_consent"] is False
+
+
+def test_notifications(client1, client2):
+    app_id = create_draft(client1)
+    submit(client1, app_id)
+    body = client1.get("/api/notifications").json()
+    assert body["unread_count"] == 1 and "отправлена" in body["items"][0]["text"]
+    note_id = body["items"][0]["id"]
+    assert client2.post(f"/api/notifications/{note_id}/read").status_code == 404  # чужое уведомление
+    assert client1.post(f"/api/notifications/{note_id}/read").status_code == 204
+    assert client1.get("/api/notifications").json()["unread_count"] == 0

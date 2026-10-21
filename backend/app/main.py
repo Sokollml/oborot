@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
-from app.api import applications, auth, companies, products
+from app.api import applications, auth, companies, notifications, products
 from app.db import engine
 from app.errors import register_error_handlers
 
@@ -68,4 +68,5 @@ api.include_router(auth.router)
 api.include_router(products.router)
 api.include_router(companies.router)
 api.include_router(applications.router)
+api.include_router(notifications.router)
 app.include_router(api)
