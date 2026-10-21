@@ -176,9 +176,15 @@ STAGES: dict[AppStatus, Callable[[int], None]] = {
 }
 
 
-def process_application(application_id: int, should_stop: Callable[[], bool] = lambda: False) -> bool:
+def process_application(
+    application_id: int,
+    should_stop: Callable[[], bool] = lambda: False,
+    heartbeat: Callable[[], None] = lambda: None,
+) -> bool:
     """Ведёт заявку по этапам, пока она в статусах конвейера.
 
+    heartbeat вызывается перед каждым этапом и продлевает «аренду» задачи: пока воркер жив,
+    задачу никто не перехватит, а если упал — её подхватят уже через JOB_LEASE_SECONDS.
     Возвращает False, если остановились досрочно по should_stop (задачу нужно вернуть в очередь).
     """
     first = True
@@ -193,4 +199,5 @@ def process_application(application_id: int, should_stop: Callable[[], bool] = l
         if not first:
             time.sleep(settings.stage_delay_seconds)  # пауза для демо: видно, как статус движется
         first = False
+        heartbeat()
         stage(application_id)

@@ -7,7 +7,8 @@
 Поэтому можно запустить несколько воркеров, и они никогда не возьмут одну задачу дважды.
 
 Как переживаем падение воркера («аренда» задачи):
-- взяв задачу, воркер помечает её running и ставит run_after = сейчас + JOB_LEASE_SECONDS;
+- взяв задачу, воркер помечает её running и ставит run_after = сейчас + JOB_LEASE_SECONDS,
+  а перед каждым этапом продлевает аренду (extend_lease) — поэтому её можно держать короткой;
 - если воркер упал и не отчитался, после истечения аренды задача снова считается свободной,
   и её подхватит следующий запуск воркера;
 - при штатной остановке (docker compose stop) воркер сразу возвращает задачу в очередь.
@@ -50,6 +51,14 @@ def claim_job() -> Job | None:
         job.attempts += 1
         job.run_after = now + timedelta(seconds=settings.job_lease_seconds)
         return job
+
+
+def extend_lease(job_id: int) -> None:
+    """Продлить аренду задачи: «я жив и продолжаю». Вызывается перед каждым этапом конвейера."""
+    with SessionLocal() as db, db.begin():
+        job = db.get(Job, job_id)
+        if job is not None and job.status == JobStatus.RUNNING:
+            job.run_after = _now() + timedelta(seconds=settings.job_lease_seconds)
 
 
 def finish_job(job_id: int) -> None:

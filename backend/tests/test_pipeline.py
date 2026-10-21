@@ -123,3 +123,20 @@ def test_stopped_worker_resumes_from_current_status(client1):
     assert process_application(app_id) is True
     history = [h["to_status"] for h in client1.get(f"/api/applications/{app_id}/history").json()]
     assert history == ["DRAFT", "SUBMITTED", "CHECKING", "SCORING", "OFFER"]  # без повторов
+
+
+def test_heartbeat_extends_lease_every_stage(client1, db):
+    """Живой воркер продлевает аренду перед каждым этапом — короткая аренда не приводит к перехвату задачи."""
+    app_id = create_draft(client1)
+    submit(client1, app_id)
+    job = queue.claim_job()
+    beats = []
+
+    def beat():
+        before = db.get(Job, job.id).run_after
+        queue.extend_lease(job.id)
+        db.expire_all()
+        beats.append(db.get(Job, job.id).run_after >= before)
+
+    assert process_application(app_id, heartbeat=beat) is True
+    assert len(beats) == 3 and all(beats)  # SUBMITTED, CHECKING, SCORING

@@ -48,7 +48,11 @@ def run_once() -> bool:
         return False
     log.info("задача %s: заявка %s (попытка %s)", job.id, job.application_id, job.attempts)
     try:
-        completed = process_application(job.application_id, should_stop=lambda: not _running)
+        completed = process_application(
+            job.application_id,
+            should_stop=lambda: not _running,
+            heartbeat=lambda: queue.extend_lease(job.id),
+        )
     except Exception as exc:  # noqa: BLE001 — любую ошибку фиксируем в задаче, воркер продолжает жить
         log.exception("задача %s упала", job.id)
         if queue.fail_job(job.id, f"{type(exc).__name__}: {exc}"):
