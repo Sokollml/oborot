@@ -13,11 +13,13 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://stupeni:stupeni@localhost:5432/stupeni"
     mock_external_url: str = "http://localhost:8001"
 
-    jwt_secret: str = "dev-secret-change-me"
+    jwt_secret: str = "dev-only-secret-change-me-0123456789abcdef"
     jwt_ttl_minutes: int = 60 * 12
 
     # Демо-режим: подсказка с тестовыми аккаунтами на экране входа.
     demo_mode: bool = True
+    # Пароль тестовых аккаунтов (создаются при первом запуске).
+    demo_password: str = "demo12345"
 
     # Воркер: пауза между этапами конвейера (чтобы на демо было видно движение статуса)
     # и частота опроса очереди задач.
