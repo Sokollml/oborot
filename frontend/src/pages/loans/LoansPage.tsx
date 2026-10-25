@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useMyLoans } from '../../api/queries';
+import { EarlyRepaymentButton } from '../../components/EarlyRepayment';
 import { LoanDetailsButtons, nextPaymentDate } from '../../components/LoanDetails';
 import { EmptyState, ErrorState, Loading } from '../../components/StateViews';
 import { months, rate, rub } from '../../lib/format';
@@ -44,7 +45,10 @@ export function LoansPage() {
             <Cell label="Срок" value={months(loan.decision?.term)} />
             <Cell label={<Term k="rate">Ставка</Term>} value={rate(loan.decision?.rate)} />
           </SimpleGrid>
-          <LoanDetailsButtons app={loan} start={new Date(loan.updated_at)} />
+          <Group gap="xs">
+            <LoanDetailsButtons app={loan} start={new Date(loan.updated_at)} />
+            <EarlyRepaymentButton loan={loan} start={new Date(loan.updated_at)} />
+          </Group>
         </Paper>
       ))}
     </Stack>
