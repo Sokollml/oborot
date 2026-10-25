@@ -12,10 +12,11 @@ import { ago, months, rub } from '../lib/format';
 
 export function HomePage() {
   const { data, isPending, error, refetch } = useMyApplications();
-  const { data: companies } = useMyCompanies();
+  const { data: companies, error: companiesError, refetch: refetchCompanies } = useMyCompanies();
 
   return (
     <Stack gap="lg">
+      {companiesError && <ErrorState error={companiesError} onRetry={refetchCompanies} title="Не получилось загрузить лимиты" />}
       {companies && companies.length > 0 && <PotentialSection companies={companies} />}
 
       <Group justify="space-between">
