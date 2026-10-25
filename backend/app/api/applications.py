@@ -12,7 +12,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.companies import get_or_create_company
-from app.services import external
 from app.deps import DB, ClientUser, get_owned_application
 from app.enums import ActorType, AppStatus, CheckSource, JobStatus, JobType
 from app.errors import Conflict, NotFound, ValidationFailed
@@ -26,6 +25,7 @@ from app.schemas import (
     HistoryItem,
     SignIn,
 )
+from app.services import external
 from app.services.state_machine import STATUS_LABELS, Actor, transition
 from app.views import application_list_item, application_out, latest_decision
 

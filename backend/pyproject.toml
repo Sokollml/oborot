@@ -33,4 +33,21 @@ filterwarnings = [
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    "ruff>=0.17.2",
 ]
+
+[tool.ruff]
+line-length = 140
+target-version = "py312"
+
+[tool.ruff.lint]
+# Ошибки (E/F), порядок импортов (I), упрощения (SIM), современный синтаксис (UP), частые баги (B)
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["E501"]  # длинные строки с русскими текстами для людей не режем
+
+[tool.ruff.lint.per-file-ignores]
+"tests/conftest.py" = ["E402"]  # переменные окружения задаются до импорта app.*
+
+[tool.ruff.lint.flake8-bugbear]
+# Form(...), File(...) и т.п. в значениях по умолчанию — обычный приём FastAPI, а не ошибка
+extend-immutable-calls = ["fastapi.Form", "fastapi.File", "fastapi.Query", "fastapi.Header", "fastapi.Depends"]

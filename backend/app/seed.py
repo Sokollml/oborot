@@ -12,9 +12,9 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import SessionLocal
 from app.enums import ActorType, AppStatus, JobStatus, JobType, Role
+from app.errors import AppError
 from app.models import Application, Job, Product, StatusHistory, User
 from app.security import hash_password
-from app.errors import AppError
 from app.services.state_machine import Actor, transition
 
 log = logging.getLogger("seed")

@@ -1,0 +1,55 @@
+# Проверки на каждый push и pull request: тесты бэкенда на настоящем PostgreSQL, линтер,
+# актуальность схемы API, типы и сборка фронтенда.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_USER: oborot
+          POSTGRES_PASSWORD: oborot
+          POSTGRES_DB: oborot
+        ports: ["5433:5432"]
+        options: >-
+          --health-cmd "pg_isready -U oborot" --health-interval 3s --health-timeout 3s --health-retries 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.0"
+      - run: uv sync --locked
+      - name: Линтер
+        run: uv run ruff check .
+      - name: Тесты
+        run: uv run pytest -q
+      - name: Схема API в docs/openapi.json актуальна
+        run: uv run python -m app.export_openapi && git diff --exit-code ../docs/openapi.json
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Типы API сгенерированы из актуальной схемы
+        run: npm run gen:api && git diff --exit-code src/api/schema.d.ts
+      - name: Проверка типов и сборка
+        run: npm run build
