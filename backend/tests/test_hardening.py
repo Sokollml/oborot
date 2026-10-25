@@ -75,3 +75,28 @@ def test_job_that_keeps_killing_worker_goes_to_specialist(client1, db):
     db.expire_all()
     assert db.get(Job, job.id).status == JobStatus.FAILED
     assert client1.get(f"/api/applications/{app_id}").json()["status"] == "MANUAL_REVIEW"
+
+
+def test_logout_revokes_token_on_server():
+    """Выход отзывает токен: сохранённая копия cookie больше не открывает кабинет."""
+    c = TestClient(app)
+    assert c.post("/api/auth/login", json={"email": "client1@demo.local", "password": settings.demo_password}).status_code == 200
+    stolen = c.cookies.get("access_token")
+    assert c.get("/api/auth/me").status_code == 200
+
+    assert c.post("/api/auth/logout").status_code == 204
+    replay = TestClient(app)
+    replay.cookies.set("access_token", stolen)
+    assert replay.get("/api/auth/me").status_code == 401
+    # Новый вход выдаёт новый токен — он работает
+    assert c.post("/api/auth/login", json={"email": "client1@demo.local", "password": settings.demo_password}).status_code == 200
+    assert c.get("/api/auth/me").status_code == 200
+
+
+def test_cookie_is_secure_behind_https_proxy():
+    c = TestClient(app)
+    body = {"email": "client2@demo.local", "password": settings.demo_password}
+    plain = c.post("/api/auth/login", json=body)
+    assert "secure" not in plain.headers["set-cookie"].lower()  # локальный http-стенд — cookie обычная
+    https = c.post("/api/auth/login", json=body, headers={"X-Forwarded-Proto": "https"})
+    assert "secure" in https.headers["set-cookie"].lower()

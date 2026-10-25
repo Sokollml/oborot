@@ -2,17 +2,19 @@
 
 import time
 from collections import defaultdict, deque
+from datetime import UTC, datetime
+from typing import Annotated
 
-from fastapi import APIRouter, Response
-from sqlalchemy import select
+from fastapi import APIRouter, Cookie, Request, Response
+from sqlalchemy import delete, select
 
 from app.config import settings
 from app.deps import DB, CurrentUser
 from app.enums import Role
 from app.errors import NotAuthenticated, TooManyRequests
-from app.models import User
+from app.models import RevokedToken, User
 from app.schemas import DemoAccount, LoginIn, MetaOut, UserOut
-from app.security import COOKIE_NAME, create_token, verify_password
+from app.security import COOKIE_NAME, create_token, decode_token, verify_password
 
 router = APIRouter(tags=["Авторизация"])
 
@@ -39,7 +41,7 @@ def _recent_failures(email: str) -> deque[float]:
 
 
 @router.post("/auth/login", response_model=UserOut, summary="Войти по email и паролю")
-def login(body: LoginIn, response: Response, db: DB) -> User:
+def login(body: LoginIn, request: Request, response: Response, db: DB) -> User:
     email = body.email.strip().lower()
     failures = _recent_failures(email)
     if len(failures) >= LOGIN_MAX_FAILURES:
@@ -54,6 +56,7 @@ def login(body: LoginIn, response: Response, db: DB) -> User:
         create_token(user.id, user.role),
         httponly=True,
         samesite="lax",  # cookie не уходит с запросами с чужих сайтов — защита от CSRF
+        secure=_is_https(request),  # по https (например, через туннель) cookie не уйдёт по открытому http
         max_age=settings.jwt_ttl_minutes * 60,
         path="/",
     )
@@ -61,8 +64,23 @@ def login(body: LoginIn, response: Response, db: DB) -> User:
 
 
 @router.post("/auth/logout", status_code=204, summary="Выйти")
-def logout(response: Response) -> None:
+def logout(
+    response: Response, db: DB, access_token: Annotated[str | None, Cookie(alias=COOKIE_NAME)] = None
+) -> None:
+    """Выход отзывает токен на сервере: сохранённая где-то копия cookie больше не работает."""
+    token = decode_token(access_token) if access_token else None
+    if token is not None:
+        now = datetime.now(UTC)
+        db.execute(delete(RevokedToken).where(RevokedToken.expires_at < now))  # просроченные хранить незачем
+        if db.get(RevokedToken, token.jti) is None:
+            db.add(RevokedToken(jti=token.jti, expires_at=token.expires_at))
+        db.commit()
     response.delete_cookie(COOKIE_NAME, path="/")
+
+
+def _is_https(request: Request) -> bool:
+    # За nginx и туннелем приложение видит http — исходный протокол приходит в X-Forwarded-Proto.
+    return request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").split(",")[0].strip() == "https"
 
 
 @router.get("/auth/me", response_model=UserOut, summary="Текущий пользователь")

@@ -1,5 +1,7 @@
 """Пароли (bcrypt) и токены входа (JWT)."""
 
+import uuid
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 import bcrypt
@@ -22,19 +24,27 @@ def verify_password(password: str, password_hash: str) -> bool:
         return False
 
 
+@dataclass(frozen=True)
+class TokenData:
+    user_id: int
+    jti: str  # уникальный номер токена: по нему токен отзывается при выходе
+    expires_at: datetime
+
+
 def create_token(user_id: int, role: str) -> str:
     payload = {
         "sub": str(user_id),
         "role": role,
+        "jti": uuid.uuid4().hex,
         "exp": datetime.now(UTC) + timedelta(minutes=settings.jwt_ttl_minutes),
     }
     return jwt.encode(payload, settings.jwt_secret, algorithm=_ALGORITHM)
 
 
-def decode_token(token: str) -> int | None:
-    """Возвращает id пользователя или None, если токен неверный или просрочен."""
+def decode_token(token: str) -> TokenData | None:
+    """Данные токена или None, если токен неверный или просрочен."""
     try:
-        payload = jwt.decode(token, settings.jwt_secret, algorithms=[_ALGORITHM])
-        return int(payload["sub"])
+        payload = jwt.decode(token, settings.jwt_secret, algorithms=[_ALGORITHM], options={"require": ["sub", "jti", "exp"]})
+        return TokenData(int(payload["sub"]), str(payload["jti"]), datetime.fromtimestamp(payload["exp"], UTC))
     except (jwt.PyJWTError, KeyError, ValueError):
         return None

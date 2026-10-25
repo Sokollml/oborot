@@ -42,6 +42,15 @@ class User(Base):
     full_name: Mapped[str] = mapped_column(String(255), nullable=False)
 
 
+class RevokedToken(Base):
+    """Токены, отозванные при выходе: с таким jti запросы больше не принимаются (даже до истечения срока)."""
+
+    __tablename__ = "revoked_tokens"
+
+    jti: Mapped[str] = mapped_column(String(64), primary_key=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+
+
 class Company(Base):
     __tablename__ = "companies"
     # Одну и ту же компанию могут завести разные пользователи — у каждого своя запись.

@@ -9,15 +9,18 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.enums import Role
 from app.errors import Forbidden, NotAuthenticated, NotFound
-from app.models import Application, Company, User
+from app.models import Application, Company, RevokedToken, User
 from app.security import COOKIE_NAME, decode_token
 
 DB = Annotated[Session, Depends(get_db)]
 
 
 def get_current_user(db: DB, access_token: Annotated[str | None, Cookie(alias=COOKIE_NAME)] = None) -> User:
-    user_id = decode_token(access_token) if access_token else None
-    user = db.get(User, user_id) if user_id else None
+    token = decode_token(access_token) if access_token else None
+    # Токен после выхода отозван — даже если кто-то сохранил cookie, войти по нему нельзя.
+    if token is not None and db.get(RevokedToken, token.jti) is not None:
+        token = None
+    user = db.get(User, token.user_id) if token else None
     if user is None:
         raise NotAuthenticated("Войдите в кабинет, чтобы продолжить")
     return user
