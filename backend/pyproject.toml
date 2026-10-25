@@ -1,7 +1,7 @@
 [project]
-name = "stupeni-backend"
+name = "oborot-backend"
 version = "0.1.0"
-description = "Ступени — API и воркер кредитного конвейера"
+description = "Оборот — API и воркер кредитного конвейера"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.20.0",

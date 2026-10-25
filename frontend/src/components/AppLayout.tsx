@@ -1,13 +1,14 @@
 // Оболочка кабинета в духе интернет-банка: шапка, слева меню разделов, справа — содержимое.
 // На телефоне (уже 768 px) боковое меню прячется, а разделы переезжают в нижнюю панель вкладок,
 // как в мобильных банковских приложениях.
-import { ActionIcon, AppShell, Box, Button, Group, NavLink, Stack, Text, ThemeIcon, UnstyledButton } from '@mantine/core';
-import { IconChartBar, IconHome2, IconListCheck, IconLogout, IconPlus, IconStairsUp, IconWallet } from '@tabler/icons-react';
+import { ActionIcon, AppShell, Box, Button, Group, NavLink, Stack, Text, UnstyledButton } from '@mantine/core';
+import { IconChartBar, IconHome2, IconListCheck, IconLogout, IconPlus, IconWallet } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { useLogout, useMe } from '../api/queries';
 import { useIsMobile } from '../lib/responsive';
+import { Logo } from './Logo';
 import { NotificationBell } from './NotificationBell';
 
 type Item = { to: string; label: string; short: string; icon: ReactNode; match: (path: string) => boolean };
@@ -43,17 +44,7 @@ export function AppLayout() {
       <AppShell.Header className="app-header">
         <Group h="100%" px={mobile ? 'md' : 'lg'} justify="space-between" wrap="nowrap">
           <UnstyledButton component={Link} to={isAnalyst ? '/analyst' : '/'}>
-            <Group gap={8} wrap="nowrap">
-              <ThemeIcon size={mobile ? 30 : 34} radius="md">
-                <IconStairsUp size={20} />
-              </ThemeIcon>
-              <Text fw={800} size="xl" style={{ letterSpacing: '-0.02em' }}>
-                Ступени
-              </Text>
-              <Text size="sm" c="dimmed" visibleFrom="sm">
-                {isAnalyst ? '· кабинет специалиста' : '· для бизнеса'}
-              </Text>
-            </Group>
+            <Logo size={mobile ? 30 : 34} caption={isAnalyst ? '· кабинет специалиста' : '· для бизнеса'} />
           </UnstyledButton>
           <Group gap={mobile ? 4 : 'sm'} wrap="nowrap">
             <NotificationBell linkPrefix={isAnalyst ? '/analyst/applications/' : '/applications/'} />

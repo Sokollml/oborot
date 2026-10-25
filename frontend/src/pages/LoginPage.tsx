@@ -1,12 +1,13 @@
 // Экран 1. Вход. В демо-режиме — подсказка с тестовыми аккаунтами (клик подставляет данные).
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Alert, Anchor, Badge, Button, Center, Container, Group, Paper, PasswordInput, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core';
-import { IconInfoCircle, IconStairsUp } from '@tabler/icons-react';
+import { Alert, Anchor, Badge, Button, Center, Container, Group, Paper, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import { IconInfoCircle } from '@tabler/icons-react';
 import { useForm } from 'react-hook-form';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import { errorText } from '../api/client';
+import { Logo } from '../components/Logo';
 import { useLogin, useMe, useMeta } from '../api/queries';
 
 const schema = z.object({
@@ -38,11 +39,8 @@ export function LoginPage() {
     <Center mih="100vh" bg="gray.0">
       <Container size={440} w="100%">
         <Stack gap="lg">
-          <Group justify="center" gap="xs">
-            <ThemeIcon size={40} radius="md">
-              <IconStairsUp size={26} />
-            </ThemeIcon>
-            <Title order={1}>Ступени</Title>
+          <Group justify="center">
+            <Logo size={44} textSize="32px" />
           </Group>
           <Text ta="center" c="dimmed">
             Кредит для бизнеса онлайн: подбор, заявка и решение в одном кабинете ·{' '}

@@ -19,7 +19,7 @@
    («ИНН должен быть из 10 или 12 цифр»). На каждом статусе клиент видит: что происходит, сколько ждать,
    нужно ли что-то от него (`backend/app/services/next_action.py`).
 5. **Только синтетические данные.** Никаких email/SMS — уведомления только в кабинете. Без логотипов и названий
-   реальных банков; продукт называется «Ступени».
+   реальных банков; продукт называется «Оборот».
 6. **Только бесплатные open-source зависимости.** Новую библиотеку — добавить в
    [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md) с лицензией.
 7. **API меняется вместе с типами фронта:** после изменения схем —
@@ -66,7 +66,7 @@ frontend/src/
 
 ```bash
 docker compose up --build                                  # весь стенд, http://localhost:3000
-docker compose up -d db && cd backend && uv run pytest     # тесты бэкенда (БД stupeni_test создаётся сама)
+docker compose up -d db && cd backend && uv run pytest     # тесты бэкенда (БД oborot_test создаётся сама)
 cd backend && uv run alembic revision --autogenerate -m "…" # миграция после изменения models.py
 cd backend && uv run python -m app.export_openapi          # docs/openapi.json
 cd frontend && npm run gen:api                             # типы фронта из docs/openapi.json

@@ -2,7 +2,7 @@
 
 Тестам нужен PostgreSQL. По умолчанию берётся база из docker compose (порт 5433 на хосте):
     docker compose up -d db && cd backend && uv run pytest
-Другой адрес можно задать через TEST_DATABASE_URL. База stupeni_test создаётся автоматически.
+Другой адрес можно задать через TEST_DATABASE_URL. База oborot_test создаётся автоматически.
 
 Внешние сервисы (ЕГРЮЛ/ФНС/БКИ) в тестах не вызываются по сети: fetch() подменяется
 на чтение тех же синтетических данных, что лежат в mock-external.
@@ -14,14 +14,14 @@ import tempfile
 from pathlib import Path
 
 TEST_DATABASE_URL = os.environ.get(
-    "TEST_DATABASE_URL", "postgresql+psycopg://stupeni:stupeni@localhost:5433/stupeni_test"
+    "TEST_DATABASE_URL", "postgresql+psycopg://oborot:oborot@localhost:5433/oborot_test"
 )
 # Важно: до импорта app.* — движок БД создаётся при импорте.
 os.environ["DATABASE_URL"] = TEST_DATABASE_URL
 os.environ.setdefault("STAGE_DELAY_SECONDS", "0")
 os.environ.setdefault("EXTERNAL_RETRY_PAUSE_SECONDS", "0")
 os.environ["MOCK_DELAY_SECONDS"] = "0"
-os.environ.setdefault("UPLOAD_DIR", tempfile.mkdtemp(prefix="stupeni-uploads-"))
+os.environ.setdefault("UPLOAD_DIR", tempfile.mkdtemp(prefix="oborot-uploads-"))
 
 import pytest  # noqa: E402
 from alembic import command  # noqa: E402

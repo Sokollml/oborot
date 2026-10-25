@@ -1,13 +1,14 @@
 // Публичная страница продукта: первое, что видит человек без входа. Витрина в духе банковского сайта —
 // предложение, продукты, калькулятор платежа, как это работает, частые вопросы.
 import { Accordion, Box, Button, Container, Flex, Group, Paper, SimpleGrid, Slider, Stack, Text, ThemeIcon, Title } from '@mantine/core';
-import { IconBolt, IconBuildingBank, IconClockHour4, IconFileOff, IconSparkles, IconStairsUp } from '@tabler/icons-react';
+import { IconBolt, IconBuildingBank, IconClockHour4, IconFileOff, IconSparkles } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useProducts } from '../api/queries';
 import { annuity, months, rub } from '../lib/format';
+import { Logo } from '../components/Logo';
 import { Term } from '../lib/glossary';
 import { useIsMobile } from '../lib/responsive';
 
@@ -43,17 +44,7 @@ export function LandingPage() {
       <Box bg="white" style={{ boxShadow: '0 1px 0 #ebedef' }}>
         <Container size="lg" h={64}>
           <Group h="100%" justify="space-between">
-            <Group gap={8}>
-              <ThemeIcon size={34} radius="md">
-                <IconStairsUp size={20} />
-              </ThemeIcon>
-              <Text fw={800} size="xl">
-                Ступени
-              </Text>
-              <Text size="sm" c="dimmed" visibleFrom="sm">
-                · кредиты для бизнеса
-              </Text>
-            </Group>
+            <Logo caption="· кредиты для бизнеса" />
             <Button component={Link} to="/login">
               Войти
             </Button>
@@ -76,7 +67,7 @@ export function LandingPage() {
                   </Text>
                 </Group>
                 <Title order={1} c="white" fz={{ base: 30, sm: 48 }}>
-                  Деньги на бизнес — решение за минуты
+                  Деньги — в оборот за минуты
                 </Title>
                 <Text c="gray.4" size="lg">
                   Узнайте лимит без документов, подайте заявку за 4 шага и следите за решением в реальном времени. Без визита в офис.

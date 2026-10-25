@@ -1,5 +1,5 @@
 [project]
-name = "stupeni-mock-external"
+name = "oborot-mock-external"
 version = "0.1.0"
 description = "Мок внешних сервисов (ЕГРЮЛ, ФНС, БКИ) на синтетических данных"
 requires-python = ">=3.12,<3.13"

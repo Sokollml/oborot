@@ -10,7 +10,7 @@ from app.db import engine
 from app.errors import register_error_handlers
 
 app = FastAPI(
-    title="Ступени API",
+    title="Оборот API",
     version="0.1.0",
     description=(
         "API цифрового кредитного конвейера для малого бизнеса. "

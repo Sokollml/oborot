@@ -10,7 +10,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
-    database_url: str = "postgresql+psycopg://stupeni:stupeni@localhost:5432/stupeni"
+    database_url: str = "postgresql+psycopg://oborot:oborot@localhost:5432/oborot"
     mock_external_url: str = "http://localhost:8001"
 
     jwt_secret: str = "dev-only-secret-change-me-0123456789abcdef"

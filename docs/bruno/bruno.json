@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "Ступени API",
+  "name": "Оборот API",
   "type": "collection",
   "ignore": [
     "node_modules",

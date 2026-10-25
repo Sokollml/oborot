@@ -241,6 +241,47 @@ wheels = [
 ]
 
 [[package]]
+name = "oborot-backend"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "alembic" },
+    { name = "bcrypt" },
+    { name = "fastapi" },
+    { name = "httpx" },
+    { name = "psycopg", extra = ["binary"] },
+    { name = "pydantic-settings" },
+    { name = "pyjwt" },
+    { name = "python-multipart" },
+    { name = "pyyaml" },
+    { name = "sqlalchemy" },
+    { name = "uvicorn", extra = ["standard"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "alembic", specifier = ">=1.20.0" },
+    { name = "bcrypt", specifier = ">=5.0.0" },
+    { name = "fastapi", specifier = ">=0.157.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.6" },
+    { name = "pydantic-settings", specifier = ">=2.16.1" },
+    { name = "pyjwt", specifier = ">=2.15.1" },
+    { name = "python-multipart", specifier = ">=0.0.32" },
+    { name = "pyyaml", specifier = ">=6.0.3" },
+    { name = "sqlalchemy", specifier = ">=2.1.5" },
+    { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.1.1" }]
+
+[[package]]
 name = "opentelemetry-api"
 version = "1.45.1"
 source = { registry = "https://pypi.org/simple" }
@@ -470,47 +511,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/ad/eb/4e197bf26b023abaf
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f3/93/181df62699d9b5aca1d87e5cfda131dac87e3cdaebf668662f7206ca3470/starlette-1.9.0-py3-none-any.whl", hash = "sha256:fd3f159936e882d06c1108f84688f7cda2cf85fc6a592a50edbd175e882c2ddc", size = 80335, upload-time = "2026-10-18T15:50:31.526Z" },
 ]
-
-[[package]]
-name = "stupeni-backend"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "alembic" },
-    { name = "bcrypt" },
-    { name = "fastapi" },
-    { name = "httpx" },
-    { name = "psycopg", extra = ["binary"] },
-    { name = "pydantic-settings" },
-    { name = "pyjwt" },
-    { name = "python-multipart" },
-    { name = "pyyaml" },
-    { name = "sqlalchemy" },
-    { name = "uvicorn", extra = ["standard"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "pytest" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "alembic", specifier = ">=1.20.0" },
-    { name = "bcrypt", specifier = ">=5.0.0" },
-    { name = "fastapi", specifier = ">=0.157.0" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.6" },
-    { name = "pydantic-settings", specifier = ">=2.16.1" },
-    { name = "pyjwt", specifier = ">=2.15.1" },
-    { name = "python-multipart", specifier = ">=0.0.32" },
-    { name = "pyyaml", specifier = ">=6.0.3" },
-    { name = "sqlalchemy", specifier = ">=2.1.5" },
-    { name = "uvicorn", extras = ["standard"], specifier = ">=0.54.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=9.1.1" }]
 
 [[package]]
 name = "typing-extensions"

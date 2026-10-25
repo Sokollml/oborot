@@ -3,10 +3,10 @@
 # Все переменные имеют значения по умолчанию, поэтому .env не обязателен
 # (но его удобно создать из .env.example, чтобы что-то поменять).
 
-name: stupeni
+name: oborot
 
 x-backend-env: &backend-env
-  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-stupeni}:${POSTGRES_PASSWORD:-stupeni}@db:5432/${POSTGRES_DB:-stupeni}
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-oborot}:${POSTGRES_PASSWORD:-oborot}@db:5432/${POSTGRES_DB:-oborot}
   MOCK_EXTERNAL_URL: http://mock-external:8001
   JWT_SECRET: ${JWT_SECRET:-dev-only-secret-change-me-0123456789abcdef}
   DEMO_MODE: ${DEMO_MODE:-true}
@@ -23,9 +23,9 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-stupeni}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-stupeni}
-      POSTGRES_DB: ${POSTGRES_DB:-stupeni}
+      POSTGRES_USER: ${POSTGRES_USER:-oborot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-oborot}
+      POSTGRES_DB: ${POSTGRES_DB:-oborot}
     ports:
       # Для тестов бэкенда с хоста (uv run pytest). Только для этого компьютера, не для локальной сети.
       - "127.0.0.1:${DB_PORT:-5433}:5432"
@@ -39,7 +39,7 @@ services:
 
   api:
     build: ./backend
-    image: stupeni-backend:dev
+    image: oborot-backend:dev
     environment: *backend-env
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000" # Swagger для разработчиков
@@ -59,7 +59,7 @@ services:
   # Тот же образ, что и у api, — другая команда запуска.
   worker:
     build: ./backend
-    image: stupeni-backend:dev
+    image: oborot-backend:dev
     command: ["python", "-m", "app.worker"]
     environment: *backend-env
     volumes:
