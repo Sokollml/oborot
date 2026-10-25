@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { api, errorText } from '../api/client';
 import type { MyCompany } from '../api/types';
+import { clickable } from '../lib/a11y';
 import { ago, rub } from '../lib/format';
 import { Term } from '../lib/glossary';
 import { useIsMobile } from '../lib/responsive';
@@ -47,7 +48,7 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
   const calculated = companies.filter((c) => c.potential);
   const ok = calculated.filter((c) => c.potential?.status === 'ok');
   const best = ok.sort((a, b) => (b.potential?.max_amount ?? 0) - (a.potential?.max_amount ?? 0))[0];
-  const bestOffer = best?.potential?.offers?.reduce((x, y) => (y.amount > x.amount ? y : x));
+  const bestOffer = best?.potential?.offers?.reduce<(typeof best.potential.offers)[number] | undefined>((x, y) => (!x || y.amount > x.amount ? y : x), undefined);
 
   // Ещё ничего не считали — один призыв с согласием.
   if (calculated.length === 0) {
@@ -138,7 +139,7 @@ export function PotentialSection({ companies }: { companies: MyCompany[] }) {
         <Table verticalSpacing="sm" horizontalSpacing={mobile ? 'md' : 'xl'} highlightOnHover>
           <Table.Tbody>
             {companies.map((c) => (
-              <Table.Tr key={c.id} style={{ cursor: 'pointer' }} onClick={() => setDetails(c)}>
+              <Table.Tr key={c.id} {...clickable(() => setDetails(c), `Лимит: ${c.name}`)}>
                 <Table.Td>
                   <Text fw={600}>{c.name}</Text>
                   <Text size="xs" c="dimmed">

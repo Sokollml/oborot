@@ -135,7 +135,7 @@ export function OfferBlock({ app }: { app: Application }) {
           title="Принять предложение?"
           text={`${rub(d.amount)} на ${months(d.term)}, платёж ${rub(d.monthly_payment)} в месяц. Дальше — подписание договора кодом.`}
           confirmLabel="Да, принимаю"
-          onConfirm={() => accept.mutate()}
+          onConfirm={() => accept.mutate({ decision_id: d.id })}
           loading={accept.isPending}
           disabled={decline.isPending}
         />

@@ -566,6 +566,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcceptIn */
+        AcceptIn: {
+            /**
+             * Decision Id
+             * @description Какое предложение клиент видел на экране (decision.id). Если специалист успел изменить условия — 409
+             * @example 7
+             */
+            decision_id?: number | null;
+        };
         /**
          * ActorType
          * @enum {string}
@@ -932,6 +941,12 @@ export interface components {
         };
         /** DecisionOut */
         DecisionOut: {
+            /**
+             * Id
+             * @description Номер версии решения: меняется, когда специалист меняет условия
+             * @example 7
+             */
+            id: number;
             /**
              * Type
              * @description approve — одобрено, counter — контрпредложение, info — нужны документы, reject — отказ
@@ -2144,7 +2159,11 @@ export interface operations {
                 access_token?: string | null;
             };
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AcceptIn"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

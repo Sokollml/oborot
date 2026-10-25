@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { IconBolt, IconBuildingFactory2, IconCheck, IconPackage } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { errorText } from '../api/client';
@@ -39,6 +39,9 @@ export function RecommendPage() {
   const [term, setTerm] = useState(12);
   const recommend = useRecommend();
   const navigate = useNavigate();
+  // Поменяли цель, сумму или срок — старая рекомендация уже не про то, убираем её до нового расчёта.
+  const { reset } = recommend;
+  useEffect(() => reset(), [purpose, amount, term, reset]);
 
   const stepIndex = AMOUNT_STEPS.reduce((best, v, i) => (Math.abs(v - amount) < Math.abs(AMOUNT_STEPS[best] - amount) ? i : best), 0);
 

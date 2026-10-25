@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAnalystQueue, useProducts, type QueueView } from '../../api/queries';
 import { EmptyState, ErrorState, Loading } from '../../components/StateViews';
 import { StatusBadge } from '../../components/StatusBadge';
+import { clickable } from '../../lib/a11y';
 import { months, rub, waiting } from '../../lib/format';
 import { Term } from '../../lib/glossary';
 import { useIsMobile } from '../../lib/responsive';
@@ -78,7 +79,7 @@ export function QueuePage() {
       {data && data.length > 0 && mobile && (
         <Stack gap="sm">
           {data.map((q) => (
-            <Paper key={q.id} p="md" onClick={() => navigate(`/analyst/applications/${q.id}`)} style={{ cursor: 'pointer' }}>
+            <Paper key={q.id} p="md" {...clickable(() => navigate(`/analyst/applications/${q.id}`), `Открыть заявку №${q.id}`)}>
               <Group justify="space-between" wrap="nowrap" mb={4}>
                 <Text fw={700} truncate>
                   {q.company_name}
@@ -122,7 +123,7 @@ export function QueuePage() {
             </Table.Thead>
             <Table.Tbody>
               {data.map((q) => (
-                <Table.Tr key={q.id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/analyst/applications/${q.id}`)}>
+                <Table.Tr key={q.id} {...clickable(() => navigate(`/analyst/applications/${q.id}`), `Открыть заявку №${q.id}`)}>
                   <Table.Td c="dimmed">{q.id}</Table.Td>
                   <Table.Td>
                     <Text fw={600}>{q.company_name}</Text>

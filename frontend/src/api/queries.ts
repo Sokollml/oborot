@@ -158,6 +158,9 @@ function useApplicationAction<TBody = void>(id: number, path: string, headers?: 
       qc.invalidateQueries({ queryKey: ['applications'] });
       qc.invalidateQueries({ queryKey: ['notifications'] });
     },
+    // Действие не прошло (например, специалист только что изменил условия) — перечитываем заявку,
+    // чтобы на экране было актуальное состояние, а не то, на которое клиент уже не может ответить.
+    onError: () => qc.invalidateQueries({ queryKey: ['application', id] }),
   });
 }
 
@@ -168,7 +171,8 @@ export function useSubmitApplication(id: number) {
   return useApplicationAction(id, 'submit', () => ({ 'Idempotency-Key': key }));
 }
 
-export const useAcceptOffer = (id: number) => useApplicationAction(id, 'offer/accept');
+// decision_id — версия условий, которые клиент видит: если специалист их уже поменял, сервер ответит 409.
+export const useAcceptOffer = (id: number) => useApplicationAction<{ decision_id: number }>(id, 'offer/accept');
 export const useDeclineOffer = (id: number) => useApplicationAction(id, 'offer/decline');
 export const useCancelApplication = (id: number) => useApplicationAction(id, 'cancel');
 export const useSign = (id: number) => useApplicationAction<{ code: string }>(id, 'sign');

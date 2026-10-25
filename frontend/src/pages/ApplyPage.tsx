@@ -216,8 +216,12 @@ function MoneyField({ control, name, label, description, suffix = ' ₽' }: { co
 
 function payload(v: Partial<FormValues>) {
   const body = { ...v, collateral_description: v.collateral_description || null };
-  // Пустые поля просто не отправляем — в черновике они остаются незаполненными.
-  return Object.fromEntries(Object.entries(body).filter(([, x]) => x !== undefined && !(typeof x === 'number' && Number.isNaN(x))));
+  // Очищенное числовое поле (NaN) отправляем как null — иначе на сервере осталось бы старое значение.
+  return Object.fromEntries(
+    Object.entries(body)
+      .filter(([, x]) => x !== undefined)
+      .map(([k, x]) => [k, typeof x === 'number' && Number.isNaN(x) ? null : x]),
+  );
 }
 
 /**

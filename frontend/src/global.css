@@ -150,3 +150,9 @@ h1, h2, h3, h4 {
   /* Блоки, которые на телефоне не должны «липнуть» при прокрутке */
   .sticky-desktop { position: static !important; }
 }
+
+/* Кликабельные строки и карточки (lib/a11y.ts): видимая рамка при переходе с клавиатуры */
+[data-clickable]:focus-visible {
+  outline: 2px solid var(--mantine-color-accent-6);
+  outline-offset: -2px;
+}
