@@ -14,7 +14,7 @@ export function RequireRole({ role, children }: { role: User['role']; children: 
   if (isPending) return <Loading />;
   if (error) return <ErrorState error={error} onRetry={refetch} />;
   // Без входа: на главной — витрина продукта, на остальных страницах — вход (и потом обратно).
-  if (!user) return <Navigate to={location.pathname === '/' ? '/welcome' : '/login'} replace state={{ from: location.pathname }} />;
+  if (!user) return <Navigate to={location.pathname === '/' ? '/welcome' : '/login'} replace state={{ from: location.pathname + location.search }} />;
   if (user.role !== role) return <Navigate to={user.role === 'analyst' ? '/analyst' : '/'} replace />;
   return <>{children}</>;
 }

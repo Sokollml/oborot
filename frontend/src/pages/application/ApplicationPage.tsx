@@ -16,10 +16,16 @@ import { PURPOSE_TITLE } from '../../lib/statuses';
 import { DocumentsBlock, DoneBlock, OfferBlock, RejectedBlock, SignBlock } from './ActionBlocks';
 import { StageTimeline } from './StageTimeline';
 
+// key={id}: при переходе на другую заявку (например, из уведомления) экран собирается заново —
+// введённый код подписи или недописанное сообщение не «переедут» в чужую заявку.
 export function ApplicationPage() {
-  const id = Number(useParams().id);
+  const { id } = useParams();
+  return <ApplicationView key={id} id={Number(id)} />;
+}
+
+function ApplicationView({ id }: { id: number }) {
   const { data: app, isPending, error, refetch } = useApplication(id);
-  const { data: history } = useHistory(id, app?.status);
+  const { data: history, error: historyError, refetch: refetchHistory } = useHistory(id, app?.status);
 
   if (isPending) return <Loading text="Загружаем заявку…" />;
   if (error) {
@@ -51,7 +57,13 @@ export function ApplicationPage() {
       <Grid gap="lg">
         <Grid.Col span={{ base: 12, md: 5 }} order={{ base: 2, md: 1 }}>
           <Stack>
-            {history ? <StageTimeline app={app} history={history} /> : <Loading />}
+            {history ? (
+              <StageTimeline app={app} history={history} />
+            ) : historyError ? (
+              <ErrorState error={historyError} onRetry={refetchHistory} />
+            ) : (
+              <Loading />
+            )}
             <Details app={app} />
           </Stack>
         </Grid.Col>

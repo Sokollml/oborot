@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { useProducts } from '../api/queries';
 import { annuity, months, rub } from '../lib/format';
 import { Logo } from '../components/Logo';
+import { ErrorState, Loading } from '../components/StateViews';
 import { Term } from '../lib/glossary';
 import { useIsMobile } from '../lib/responsive';
 
@@ -27,7 +28,7 @@ const FAQ = [
 ];
 
 export function LandingPage() {
-  const { data: products } = useProducts();
+  const { data: products, isPending, error, refetch } = useProducts();
   const [amount, setAmount] = useState(2_000_000);
   const [term, setTerm] = useState(12);
   const mobile = useIsMobile();
@@ -41,7 +42,7 @@ export function LandingPage() {
 
   return (
     <Box bg="gray.0" mih="100vh">
-      <Box bg="white" style={{ boxShadow: '0 1px 0 #ebedef' }}>
+      <Box bg="white" style={{ boxShadow: '0 1px 0 var(--mantine-color-gray-1)' }}>
         <Container size="lg" h={64}>
           <Group h="100%" justify="space-between">
             <Logo caption="· кредиты для бизнеса" />
@@ -92,6 +93,8 @@ export function LandingPage() {
           {/* Продукты */}
           <Stack gap="md">
             <Title order={2}>Кредиты для бизнеса</Title>
+            {isPending && <Loading text="Загружаем продукты…" />}
+            {error && <ErrorState error={error} onRetry={refetch} />}
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
               {(products ?? []).map((p) => (
                 <Paper key={p.code} p="xl">
@@ -114,7 +117,7 @@ export function LandingPage() {
 
           {/* Калькулятор */}
           <Paper p={{ base: 'lg', sm: 'xl' }} id="calc">
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: "lg", md: 48 }}>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing={{ base: 'lg', md: 48 }}>
               <Stack gap="lg">
                 <Title order={2}>Рассчитайте платёж</Title>
                 <div>
@@ -152,7 +155,7 @@ export function LandingPage() {
                     </Button>
                   </Stack>
                 ) : (
-                  <Text c="dimmed">Измените сумму или срок — подберём подходящий кредит.</Text>
+                  <Text c="dimmed">{isPending ? 'Загружаем продукты…' : 'Измените сумму или срок — подберём подходящий кредит.'}</Text>
                 )}
               </Paper>
             </SimpleGrid>

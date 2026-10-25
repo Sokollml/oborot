@@ -252,7 +252,8 @@ function useAutosave(appId: number, values: Partial<FormValues>, getValues: () =
 export function ApplyPage() {
   const params = useParams();
   const id = params.id ? Number(params.id) : undefined;
-  return id ? <DraftForm id={id} /> : <NewApplication />;
+  // key: форма берёт значения из заявки один раз, поэтому другой черновик — новая форма.
+  return id ? <DraftForm key={id} id={id} /> : <NewApplication />;
 }
 
 function NewApplication() {
@@ -307,9 +308,10 @@ function Header() {
 
 function DraftForm({ id }: { id: number }) {
   const { data: app, isPending, error, refetch } = useApplication(id);
-  const { data: products } = useProducts();
-  if (isPending || !products) return <Loading text="Открываем черновик…" />;
+  const { data: products, error: productsError, refetch: refetchProducts } = useProducts();
   if (error) return <ErrorState error={error} onRetry={refetch} />;
+  if (productsError) return <ErrorState error={productsError} onRetry={refetchProducts} />;
+  if (isPending || !products) return <Loading text="Открываем черновик…" />;
   if (app.status !== 'DRAFT') return <Navigate to={`/applications/${id}`} replace />;
   return <DraftFormInner app={app} products={products} />;
 }
@@ -366,6 +368,11 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
   };
 
   const onSubmit = async () => {
+    // На шаг 4 можно попасть ссылкой (?step=3), минуя «Далее», — перед отправкой проверяем все шаги.
+    for (const s of [1, 2]) {
+      const valid = await trigger(STEP_FIELDS[s]);
+      if (!valid || (s === 2 && !checkProductLimits())) return goto(s);
+    }
     if (!getValues('bki_consent')) {
       setError('bki_consent', { message: 'Без согласия мы не сможем проверить кредитную историю' });
       return;
@@ -531,6 +538,8 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
             </>
           )}
 
+          {cancel.error && <Alert color="red">{errorText(cancel.error)}</Alert>}
+
           <Divider />
           <Group justify="space-between">
             <Group>
@@ -551,7 +560,7 @@ function DraftFormInner({ app, products }: { app: Application; products: Product
             {step < 3 ? (
               <Button onClick={next}>Далее</Button>
             ) : (
-              <Button size="md" onClick={onSubmit} loading={submit.isPending}>
+              <Button size="md" onClick={onSubmit} loading={submit.isPending || autosave.saving}>
                 Отправить заявку
               </Button>
             )}

@@ -73,9 +73,9 @@ export function ClientSection({ card }: { card: AnalystCard }) {
 }
 
 const LEVEL = {
-  ok: { color: 'green', bg: '#ebf8ef', icon: <IconCheck size={16} /> },
-  warn: { color: 'orange', bg: '#fff4e5', icon: <IconAlertTriangle size={16} /> },
-  bad: { color: 'red', bg: '#ffeceb', icon: <IconX size={16} /> },
+  ok: { color: 'green', bg: 'var(--tint-ok)', icon: <IconCheck size={16} /> },
+  warn: { color: 'orange', bg: 'var(--tint-warn)', icon: <IconAlertTriangle size={16} /> },
+  bad: { color: 'red', bg: 'var(--tint-bad)', icon: <IconX size={16} /> },
 } as const;
 
 function CheckCard({ check }: { check: CheckOut }) {

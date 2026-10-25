@@ -1,11 +1,13 @@
 // «Мои кредиты»: выданные кредиты с ближайшим платежом и графиком.
 import { Group, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useMyLoans } from '../../api/queries';
 import { LoanDetailsButtons, nextPaymentDate } from '../../components/LoanDetails';
 import { EmptyState, ErrorState, Loading } from '../../components/StateViews';
 import { months, rate, rub } from '../../lib/format';
+import { Term } from '../../lib/glossary';
 
 export function LoansPage() {
   const { data, isPending, error, refetch } = useMyLoans();
@@ -40,7 +42,7 @@ export function LoansPage() {
             <Cell label="Ближайший платёж" value={nextPaymentDate(loan.updated_at)} />
             <Cell label="Сумма платежа" value={rub(loan.decision?.monthly_payment)} accent />
             <Cell label="Срок" value={months(loan.decision?.term)} />
-            <Cell label="Ставка" value={rate(loan.decision?.rate)} />
+            <Cell label={<Term k="rate">Ставка</Term>} value={rate(loan.decision?.rate)} />
           </SimpleGrid>
           <LoanDetailsButtons app={loan} start={new Date(loan.updated_at)} />
         </Paper>
@@ -49,7 +51,7 @@ export function LoansPage() {
   );
 }
 
-function Cell({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function Cell({ label, value, accent }: { label: ReactNode; value: string; accent?: boolean }) {
   return (
     <Paper p="sm" radius="lg" bg={accent ? 'accent.0' : 'gray.0'}>
       <Text size="xs" c="dimmed">

@@ -1,8 +1,8 @@
 // Блоки «Что дальше» для каждого состояния заявки: предложение, подпись, деньги, отказ, документы.
-import { Alert, Button, FileButton, Group, List, Modal, Paper, PinInput, SimpleGrid, Stack, Table, Text, ThemeIcon, Title } from '@mantine/core';
+import { Alert, Button, FileButton, Group, List, Modal, Paper, PinInput, SimpleGrid, Stack, Table, Text, ThemeIcon } from '@mantine/core';
 import { IconBulb, IconCircleCheck, IconFileText, IconUpload, IconX } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { errorText } from '../../api/client';
@@ -19,13 +19,15 @@ function ConfirmButton(props: {
   confirmLabel: string;
   onConfirm: () => void;
   loading: boolean;
+  disabled?: boolean;
   variant?: string;
   color?: string;
 }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button variant={props.variant} color={props.color} onClick={() => setOpen(true)}>
+      {/* Окно закрывается сразу после подтверждения, поэтому «крутилка» и блокировка — на самой кнопке. */}
+      <Button variant={props.variant} color={props.color} onClick={() => setOpen(true)} loading={props.loading} disabled={props.disabled}>
         {props.label}
       </Button>
       <Modal opened={open} onClose={() => setOpen(false)} title={props.title} centered>
@@ -135,6 +137,7 @@ export function OfferBlock({ app }: { app: Application }) {
           confirmLabel="Да, принимаю"
           onConfirm={() => accept.mutate()}
           loading={accept.isPending}
+          disabled={decline.isPending}
         />
         <ConfirmButton
           label="Отказаться"
@@ -143,6 +146,7 @@ export function OfferBlock({ app }: { app: Application }) {
           confirmLabel="Отказаться"
           onConfirm={() => decline.mutate()}
           loading={decline.isPending}
+          disabled={accept.isPending}
           variant="default"
           color="red"
         />
@@ -290,10 +294,12 @@ const ACCEPT = 'application/pdf,image/jpeg,image/png';
 function DocumentRow({ app, doc }: { app: Application; doc: Application['documents'][number] }) {
   const upload = useUploadDocument(app.id);
   const [localError, setLocalError] = useState<string | null>(null);
+  const resetRef = useRef<() => void>(null);
   const uploaded = doc.status === 'uploaded';
 
   const pick = (file: File | null) => {
     setLocalError(null);
+    resetRef.current?.(); // иначе повторный выбор того же файла (после ошибки) не сработает
     if (!file) return;
     // Проверяем сразу в браузере, чтобы не ждать ответа сервера (сервер всё равно проверит ещё раз).
     if (!['application/pdf', 'image/jpeg', 'image/png'].includes(file.type)) return setLocalError('Подходят только PDF, JPG или PNG');
@@ -302,7 +308,7 @@ function DocumentRow({ app, doc }: { app: Application; doc: Application['documen
   };
 
   return (
-    <Paper p="md" radius="lg" bg={uploaded ? '#ebf8ef' : 'gray.0'}>
+    <Paper p="md" radius="lg" bg={uploaded ? 'var(--tint-ok)' : 'gray.0'}>
       <Group justify="space-between" wrap="nowrap">
         <Group gap="sm" wrap="nowrap">
           <ThemeIcon size={36} radius="md" color={uploaded ? 'green' : 'gray'} variant={uploaded ? 'filled' : 'light'}>
@@ -318,7 +324,7 @@ function DocumentRow({ app, doc }: { app: Application; doc: Application['documen
           </div>
         </Group>
         {!uploaded && (
-          <FileButton onChange={pick} accept={ACCEPT}>
+          <FileButton onChange={pick} accept={ACCEPT} resetRef={resetRef}>
             {(props) => (
               <Button {...props} leftSection={<IconUpload size={16} />} loading={upload.isPending}>
                 Загрузить
@@ -356,8 +362,4 @@ export function DocumentsBlock({ app }: { app: Application }) {
       )}
     </Stack>
   );
-}
-
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return <Title order={4}>{children}</Title>;
 }

@@ -9,8 +9,13 @@ import { ErrorState, Loading } from '../../components/StateViews';
 import { plural, rubShort } from '../../lib/format';
 import { Term } from '../../lib/glossary';
 
-const BAR = '#0b1f35'; // одна нейтральная графитовая заливка для величин
-const RISK_FILL: Record<string, string> = { A: '#2f9e44', B: '#0ca678', C: '#f08c00', D: '#e03131' };
+const BAR = 'var(--mantine-color-gray-9)'; // одна нейтральная графитовая заливка для величин
+const RISK_FILL: Record<string, string> = {
+  A: 'var(--mantine-color-green-8)',
+  B: 'var(--mantine-color-teal-7)',
+  C: 'var(--mantine-color-yellow-8)',
+  D: 'var(--mantine-color-red-8)',
+};
 
 function duration(sec: number | null | undefined): string {
   if (sec == null) return '—';

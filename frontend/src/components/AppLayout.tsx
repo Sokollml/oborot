@@ -52,11 +52,11 @@ export function AppLayout() {
               {user?.full_name}
             </Text>
             {mobile ? (
-              <ActionIcon variant="subtle" color="gray" size="lg" onClick={doLogout} aria-label="Выйти">
+              <ActionIcon variant="subtle" color="gray" size="lg" onClick={doLogout} loading={logout.isPending} aria-label="Выйти">
                 <IconLogout size={20} />
               </ActionIcon>
             ) : (
-              <Button variant="subtle" color="gray" size="sm" leftSection={<IconLogout size={16} />} onClick={doLogout}>
+              <Button variant="subtle" color="gray" size="sm" leftSection={<IconLogout size={16} />} onClick={doLogout} loading={logout.isPending}>
                 Выйти
               </Button>
             )}

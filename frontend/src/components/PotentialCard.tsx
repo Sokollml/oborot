@@ -23,7 +23,7 @@ export function PotentialCard({ company }: { company: MyCompany }) {
   const tips = p?.tips ?? [];
 
   const header = (
-    <Group gap="xs" wrap="nowrap">
+    <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
       <ThemeIcon variant="light" color="gray" size={32} radius="md">
         <IconBuildingBank size={18} />
       </ThemeIcon>
@@ -81,6 +81,7 @@ export function PotentialCard({ company }: { company: MyCompany }) {
             leftSection={<IconRefresh size={14} />}
             loading={calc.isPending}
             onClick={() => calc.mutate(company.id)}
+            style={{ flexShrink: 0 }}
           >
             Пересчитать
           </Button>
@@ -97,7 +98,7 @@ export function PotentialCard({ company }: { company: MyCompany }) {
               </Title>
             </div>
             <Text size="sm">{p.text}</Text>
-            <SimpleGrid cols={offers.length > 1 ? 2 : 1} spacing="sm">
+            <SimpleGrid cols={{ base: 1, xs: offers.length > 1 ? 2 : 1 }} spacing="sm">
               {offers.map((o) => (
                 <Paper key={o.product_code} bg="gray.0" p="md" radius="lg">
                   <Text size="sm" fw={600}>

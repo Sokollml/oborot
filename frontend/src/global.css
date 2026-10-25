@@ -3,6 +3,10 @@
 :root {
   --page-bg: #f3f4f5;
   --mantine-color-body: #ffffff;
+  /* Мягкие подложки для плашек «хорошо / внимание / плохо» (документ загружен, проверки у специалиста) */
+  --tint-ok: #ebf8ef;
+  --tint-warn: #fff4e5;
+  --tint-bad: #ffeceb;
 }
 
 body {
@@ -139,9 +143,6 @@ h1, h2, h3, h4 {
   h1, .mantine-Title-root[data-order='1'] { font-size: 30px !important; }
   h2, .mantine-Title-root[data-order='2'] { font-size: 24px !important; }
   h3, .mantine-Title-root[data-order='3'] { font-size: 19px !important; }
-
-  /* Карточки компактнее */
-  .mantine-Paper-root[data-mobile-compact] { padding: var(--mantine-spacing-md) !important; }
 
   /* Поля ввода 16 px — иначе iOS увеличивает страницу при фокусе */
   .mantine-Input-input { font-size: 16px; }

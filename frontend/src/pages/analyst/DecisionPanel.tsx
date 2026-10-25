@@ -27,9 +27,9 @@ const STATUS_HINT: Record<string, string> = {
 export function RecommendationCard({ card, onUse }: { card: AnalystCard; onUse?: () => void }) {
   const r = card.recommendation;
   return (
-    <Paper p="xl" bg="dark.9" c="white" style={{ background: '#0b1f35' }}>
+    <Paper p="xl" bg="gray.9" c="white">
       <Group gap={8} mb="xs">
-        <IconBulb size={20} color="#ffcf4d" />
+        <IconBulb size={20} color="var(--mantine-color-yellow-4)" />
         <Text size="sm" fw={600} c="gray.4">
           Рекомендация системы
         </Text>

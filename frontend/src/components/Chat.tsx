@@ -19,7 +19,7 @@ export function Chat({ applicationId, role, title, placeholder }: { applicationI
 
   const submit = () => {
     const value = text.trim();
-    if (!value) return;
+    if (!value || send.isPending) return; // Enter во время отправки не должен отправить сообщение второй раз
     send.mutate(value, { onSuccess: () => setText('') });
   };
 
@@ -28,9 +28,17 @@ export function Chat({ applicationId, role, title, placeholder }: { applicationI
       <Title order={4} mb="sm">
         {title}
       </Title>
-      {messages.length === 0 ? (
+      {list.error && messages.length === 0 ? (
+        <Text size="sm" c="red" mb="sm">
+          Не удалось загрузить переписку: {errorText(list.error)}
+        </Text>
+      ) : messages.length === 0 ? (
         <Text size="sm" c="dimmed" mb="sm">
-          {role === 'client' ? 'Есть вопрос по заявке? Напишите — специалист ответит здесь же.' : 'Сообщений пока нет.'}
+          {list.isPending
+            ? 'Загружаем переписку…'
+            : role === 'client'
+              ? 'Есть вопрос по заявке? Напишите — специалист ответит здесь же.'
+              : 'Сообщений пока нет.'}
         </Text>
       ) : (
         <ScrollArea.Autosize mah={280} viewportRef={viewport} mb="sm">

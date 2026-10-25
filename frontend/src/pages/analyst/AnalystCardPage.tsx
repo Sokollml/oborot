@@ -12,8 +12,14 @@ import { months, rub } from '../../lib/format';
 import { ChecksSection, ClientSection, DocumentsSection, HistorySection, ScoringSection } from './CardSections';
 import { DecisionPanel, RecommendationCard } from './DecisionPanel';
 
+// key={id}: при переходе на другую заявку (например, из уведомления) панель решения и черновик
+// комментария сбрасываются, а не применяются к чужой заявке.
 export function AnalystCardPage() {
-  const id = Number(useParams().id);
+  const { id } = useParams();
+  return <AnalystCardView key={id} id={Number(id)} />;
+}
+
+function AnalystCardView({ id }: { id: number }) {
   const { data: card, isPending, error, refetch } = useAnalystCard(id);
   const [preset, setPreset] = useState(0);
 
