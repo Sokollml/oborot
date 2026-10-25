@@ -205,10 +205,14 @@ Docker Compose, nginx. Полный список и лицензии — [THIRD_
 
 ```bash
 docker compose up -d db                 # тестам нужна база (порт 5433), БД oborot_test создаётся сама
-cd backend && uv run pytest             # 141 тест: скоринг, решения, переходы, 403, идемпотентность, сценарии 1–6
+cd backend && uv run pytest             # 143 теста: скоринг, решения, переходы, 403, идемпотентность, сценарии 1–6
 cd frontend && npm ci && npm run typecheck   # проверка типов фронтенда
 cd frontend && npm run build            # проверка сборки
+cd backend && uv run ruff check .       # линтер
+uv run --with playwright python scripts/e2e.py   # сценарии 1–7 в браузере на запущенном стенде
 ```
+
+Всё это запускается автоматически на каждый push — GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
 ### Коллекция запросов
 
@@ -270,6 +274,7 @@ cd frontend && npm run build            # проверка сборки
 | [docs/submission.md](docs/submission.md) | **сдача:** тексты для формы, чек-лист, план выступления |
 | [docs/presentation.pdf](docs/presentation.pdf), [docs/speech.md](docs/speech.md) | презентация для жюри (16 слайдов) и текст выступления |
 | [docs/development.md](docs/development.md) | **для разработчиков:** правила, устройство проекта, команды |
+| [scripts/e2e.py](scripts/e2e.py) | сквозная проверка сценариев 1–7 в браузере на запущенном стенде (запускается и в CI) |
 | [docs/screenshots/](docs/screenshots/) | скриншоты экранов; обновить — `uv run --with playwright python scripts/screenshots.py` |
 | [docs/scenarios.md](docs/scenarios.md) | тестовые сценарии шаг за шагом |
 | [docs/competitors.md](docs/competitors.md) | похожие продукты банков и что мы взяли |

@@ -53,3 +53,27 @@ jobs:
         run: npm run gen:api && git diff --exit-code src/api/schema.d.ts
       - name: Проверка типов и сборка
         run: npm run build
+
+  # Весь стенд как у жюри (docker compose up) и сквозная проверка сценариев в настоящем браузере.
+  e2e:
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.0"
+      - name: Запуск стенда
+        run: |
+          docker compose up --build -d
+          for i in $(seq 1 90); do curl -sf http://localhost:3000/api/meta > /dev/null && break; sleep 2; done
+          docker compose ps
+      - name: Браузер для проверки
+        run: uv run --with playwright playwright install --with-deps chromium
+      - name: Сценарии 1–7 в браузере
+        env:
+          CHROMIUM_PATH: ""
+        run: uv run --with playwright python scripts/e2e.py
+      - name: Логи стенда при ошибке
+        if: failure()
+        run: docker compose logs --tail 200
