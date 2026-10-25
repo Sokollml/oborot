@@ -63,7 +63,9 @@ fastapi 0.157.0 (MIT), uvicorn 0.54.0 (BSD-3-Clause).
 
 ## Инструменты (не входят в поставку)
 
-uv (MIT OR Apache-2.0), Bruno — для коллекции запросов (MIT), Mermaid — диаграммы в документации (MIT).
+uv (MIT OR Apache-2.0), Bruno — для коллекции запросов (MIT), Mermaid — диаграммы в документации (MIT),
+Playwright для Python — скрипт скриншотов `scripts/screenshots.py`, ставится на время запуска (Apache-2.0),
+cloudflared — необязательный туннель для публичной ссылки, профиль `tunnel` (Apache-2.0).
 
 ## Смоделированные интеграции
 

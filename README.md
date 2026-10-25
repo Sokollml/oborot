@@ -11,6 +11,16 @@
 
 > Все данные синтетические. Внешние сервисы (ЕГРЮЛ, ФНС, БКИ), данные счёта в банке, подписание и выдача — симуляция.
 
+**Презентация:** [docs/presentation.pdf](docs/presentation.pdf) · **сдача проекта:** [docs/submission.md](docs/submission.md)
+
+| Предодобренный лимит | Решение и «Что дальше» |
+|---|---|
+| ![Главная клиента с предодобренным лимитом](docs/screenshots/03-home-limit.png) | ![Заявка одобрена: условия и лента этапов](docs/screenshots/05-offer.png) |
+| **Карточка специалиста** | **Аналитика конвейера** |
+| ![Карточка заявки у специалиста](docs/screenshots/09-analyst-card.png) | ![Аналитика: доля решений без специалиста, воронка](docs/screenshots/10-stats.png) |
+
+Остальные экраны, включая мобильную версию, — в [docs/screenshots/](docs/screenshots/).
+
 ## Возможности
 
 **Клиент**
@@ -192,7 +202,7 @@ Docker Compose, nginx. Полный список и лицензии — [THIRD_
 
 ```bash
 docker compose up -d db                 # тестам нужна база (порт 5433), БД oborot_test создаётся сама
-cd backend && uv run pytest             # 131 тестов: скоринг, решения, переходы, 403, идемпотентность, сценарии 1–6
+cd backend && uv run pytest             # 136 тестов: скоринг, решения, переходы, 403, идемпотентность, сценарии 1–6
 cd frontend && npm ci && npm run typecheck   # проверка типов фронтенда
 cd frontend && npm run build            # проверка сборки
 ```
@@ -254,7 +264,10 @@ cd frontend && npm run build            # проверка сборки
 
 | Документ | О чём |
 |---|---|
+| [docs/submission.md](docs/submission.md) | **сдача:** тексты для формы, чек-лист, план выступления |
+| [docs/presentation.pdf](docs/presentation.pdf), [docs/speech.md](docs/speech.md) | презентация для жюри (16 слайдов) и текст выступления |
 | [docs/development.md](docs/development.md) | **для разработчиков:** правила, устройство проекта, команды |
+| [docs/screenshots/](docs/screenshots/) | скриншоты экранов; обновить — `uv run --with playwright python scripts/screenshots.py` |
 | [docs/scenarios.md](docs/scenarios.md) | тестовые сценарии шаг за шагом |
 | [docs/competitors.md](docs/competitors.md) | похожие продукты банков и что мы взяли |
 | [docs/state-machine.md](docs/state-machine.md) | статусы, переходы, таблица решений |
