@@ -22,6 +22,13 @@ export function buildSchedule(amount: number, annualRatePct: number, months: num
 
 export const totalInterest = (rows: ScheduleRow[]) => rows.reduce((sum, r) => sum + r.interest, 0);
 
+/** График в CSV для бухгалтерии: «;» и запятая в дробях — так файл сразу открывается в русском Excel. */
+export function scheduleCsv(rows: ScheduleRow[]): string {
+  const head = ['№', 'Дата', 'Платёж, ₽', 'Основной долг, ₽', 'Проценты, ₽', 'Остаток, ₽'];
+  const lines = rows.map((r) => [r.n, r.date.toLocaleDateString('ru-RU'), r.payment, r.principal, r.interest, r.balance].join(';'));
+  return '\uFEFF' + [head.join(';'), ...lines].join('\r\n'); // BOM — чтобы Excel понял кириллицу
+}
+
 // ---------- Досрочное погашение ----------
 // Клиент вносит дополнительную сумму в счёт основного долга и выбирает, что уменьшить:
 // платёж (срок прежний) или срок (платёж прежний). Экономия — проценты, которые больше не начислятся.

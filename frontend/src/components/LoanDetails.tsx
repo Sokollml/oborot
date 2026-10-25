@@ -1,6 +1,6 @@
 // Прозрачные условия до подписания: график платежей, ПСК и основные условия кредита.
 import { Anchor, Button, Checkbox, Group, Modal, Paper, ScrollArea, SimpleGrid, Stack, Table, Text, ThemeIcon } from '@mantine/core';
-import { IconCalendarStats, IconFileDescription, IconFileText } from '@tabler/icons-react';
+import { IconCalendarStats, IconDownload, IconFileDescription, IconFileText } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -8,7 +8,7 @@ import type { Application } from '../api/types';
 import { date, months, rate, rub } from '../lib/format';
 import { Term } from '../lib/glossary';
 import { useIsMobile } from '../lib/responsive';
-import { buildSchedule, totalInterest } from '../lib/schedule';
+import { buildSchedule, scheduleCsv, totalInterest, type ScheduleRow } from '../lib/schedule';
 import { PURPOSE_TITLE } from '../lib/statuses';
 
 function useSchedule(app: Application, start: Date) {
@@ -55,12 +55,26 @@ export function ScheduleTable({ app, start }: { app: Application; start: Date })
           </Table.Tbody>
         </Table>
       </ScrollArea.Autosize>
-      <Text size="xs" c="dimmed">
-        Платёж <Term k="annuity">равными частями</Term>: сумма одинаковая, а доля процентов в ней со временем уменьшается.
-        Даты — ориентировочные, от даты выдачи.
-      </Text>
+      <Group justify="space-between" align="flex-start" gap="xs">
+        <Text size="xs" c="dimmed" maw={520}>
+          Платёж <Term k="annuity">равными частями</Term>: сумма одинаковая, а доля процентов в ней со временем уменьшается.
+          Даты — ориентировочные, от даты выдачи.
+        </Text>
+        <Button variant="default" size="xs" leftSection={<IconDownload size={14} />} onClick={() => downloadCsv(rows, app.id)}>
+          Скачать для Excel
+        </Button>
+      </Group>
     </Stack>
   );
+}
+
+function downloadCsv(rows: ScheduleRow[], appId: number) {
+  const url = URL.createObjectURL(new Blob([scheduleCsv(rows)], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `график-платежей-заявка-${appId}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function Fact({ label, value }: { label: ReactNode; value: ReactNode }) {
