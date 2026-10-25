@@ -74,6 +74,9 @@ def release_job(job_id: int) -> None:
         job = db.get(Job, job_id)
         job.status = JobStatus.PENDING
         job.run_after = _now()
+        # Штатная остановка — не неудачная попытка: иначе после пары перезапусков
+        # первая же ошибка сразу провалила бы задачу без повторов.
+        job.attempts = max(job.attempts - 1, 0)
 
 
 def fail_job(job_id: int, error: str) -> bool:

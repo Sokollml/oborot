@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.deps import DB, AnalystUser, ClientUser, get_owned_application
 from app.enums import AppStatus, Role
-from app.errors import Conflict, NotFound
+from app.errors import Conflict, NotFound, ValidationFailed
 from app.models import Application, ApplicationMessage, Company, Notification, User
 from app.schemas import MessageIn, MessageOut
 
@@ -29,7 +29,10 @@ def _list(db: Session, app_id: int) -> list[MessageOut]:
 def _post(db: Session, app: Application, user: User, text: str) -> list[MessageOut]:
     if app.status == AppStatus.DRAFT:
         raise Conflict("Задать вопрос можно после отправки заявки")
-    db.add(ApplicationMessage(application_id=app.id, author_id=user.id, author_role=user.role, text=text.strip()))
+    text = text.strip()
+    if not text:
+        raise ValidationFailed("Напишите текст сообщения")
+    db.add(ApplicationMessage(application_id=app.id, author_id=user.id, author_role=user.role, text=text))
     if user.role == Role.CLIENT:
         recipients = db.scalars(select(User.id).where(User.role == Role.ANALYST)).all()
         note = f"Клиент написал по заявке №{app.id}"

@@ -141,6 +141,10 @@ def patch_application(application_id: int, body: ApplicationPatch, db: DB, user:
     if app.status != AppStatus.DRAFT:
         raise Conflict("Отправленную заявку уже нельзя изменить")
     changes = body.model_dump(exclude_unset=True)
+    # Цель и согласие в базе обязательны: null для них значит «не менять» (иначе база ответит ошибкой → 500).
+    for field in ("purpose", "bki_consent"):
+        if changes.get(field, ...) is None:
+            del changes[field]
     if code := changes.pop("product_code", None):
         app.product_id = _product(db, code).id
     for field, value in changes.items():

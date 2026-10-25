@@ -11,8 +11,13 @@ def _check_digit(digits: list[int], weights: list[int]) -> int:
     return sum(d * w for d, w in zip(digits, weights, strict=False)) % 11 % 10
 
 
+def _digits_only(inn: str) -> bool:
+    # isdigit() пропускает «²» и цифры других алфавитов — нужны только 0–9.
+    return inn.isascii() and inn.isdigit()
+
+
 def is_valid_inn(inn: str) -> bool:
-    if not inn.isdigit() or len(inn) not in (10, 12):
+    if not _digits_only(inn) or len(inn) not in (10, 12):
         return False
     d = [int(c) for c in inn]
     if len(inn) == 10:
@@ -23,7 +28,7 @@ def is_valid_inn(inn: str) -> bool:
 def validate_inn(inn: str) -> str:
     """Возвращает очищенный ИНН или бросает понятную ошибку."""
     inn = inn.strip()
-    if not inn.isdigit() or len(inn) not in (10, 12):
+    if not _digits_only(inn) or len(inn) not in (10, 12):
         raise ValidationFailed("ИНН должен состоять из 10 цифр (для компании) или 12 цифр (для ИП)")
     if not is_valid_inn(inn):
         raise ValidationFailed("В ИНН ошибка: не сходится контрольная цифра. Проверьте номер")

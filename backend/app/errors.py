@@ -5,6 +5,7 @@
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import DataError
 
 
 class AppError(Exception):
@@ -47,3 +48,9 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     def _handle(_request: Request, exc: AppError) -> JSONResponse:
         return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+    # База отвергла значение (например, номер заявки или число больше, чем помещается в колонку) —
+    # это ошибка во входных данных, а не сбой сервера: отвечаем 422, текст ошибки базы наружу не отдаём.
+    @app.exception_handler(DataError)
+    def _handle_data_error(_request: Request, _exc: DataError) -> JSONResponse:
+        return JSONResponse(status_code=422, content={"detail": "Проверьте введённые данные: значение вне допустимых границ"})

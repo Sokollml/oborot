@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from app.models import Notification
 from app.worker.__main__ import run_once
+from tests.helpers import create_draft
 from tests.scenarios import SCENARIOS
 from tests.test_pipeline import run_scenario
 
@@ -162,6 +163,8 @@ def test_queue_filters(client1, analyst):
     assert len(analyst.get("/api/analyst/queue", params={"view": "all"}).json()) == 2
     assert analyst.get("/api/analyst/queue", params={"view": "all", "product": "EXPRESS"}).json()[0]["product_code"] == "EXPRESS"
     assert analyst.get("/api/analyst/queue", params={"status": "OFFER"}).json()[0]["status"] == "OFFER"
+    create_draft(client1)  # черновик специалисту не виден даже через явный фильтр
+    assert analyst.get("/api/analyst/queue", params={"status": "DRAFT"}).json() == []
 
 
 def test_upload_not_allowed_outside_info_requested(client1):

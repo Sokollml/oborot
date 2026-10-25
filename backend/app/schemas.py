@@ -109,13 +109,18 @@ class CompanyOut(ORM):
 
 # ---------- Заявки ----------
 
+# Верхние границы чисел в анкете: заведомо больше любых реальных значений, но меньше,
+# чем помещается в колонку базы, — иначе опечатка с лишними нулями даёт 500 вместо понятной ошибки.
+MAX_MONEY = 10**15  # ₽
+MAX_TERM = 600  # мес.
+
 
 class ApplicationCreate(BaseModel):
     product_code: str = Field(description="Код продукта", examples=["EXPRESS"])
     inn: str = Field(description="ИНН компании (10 цифр) или ИП (12 цифр)", examples=["0010000017"])
     purpose: Purpose = Field(examples=["urgent"])
-    amount: int | None = Field(default=None, gt=0, examples=[2_000_000])
-    term_months: int | None = Field(default=None, gt=0, examples=[12])
+    amount: int | None = Field(default=None, gt=0, le=MAX_MONEY, examples=[2_000_000])
+    term_months: int | None = Field(default=None, gt=0, le=MAX_TERM, examples=[12])
 
 
 class ApplicationPatch(BaseModel):
@@ -123,14 +128,18 @@ class ApplicationPatch(BaseModel):
 
     product_code: str | None = Field(default=None, examples=["EXPRESS"])
     purpose: Purpose | None = None
-    amount: int | None = Field(default=None, gt=0, description="Сумма кредита, ₽", examples=[2_000_000])
-    term_months: int | None = Field(default=None, gt=0, description="Срок, мес.", examples=[12])
-    revenue_12m: int | None = Field(default=None, ge=0, description="Выручка за последние 12 месяцев, ₽", examples=[30_000_000])
-    revenue_prev_year: int | None = Field(default=None, ge=0, description="Выручка за предыдущие 12 месяцев, ₽", examples=[26_000_000])
-    monthly_debt_payments: int | None = Field(
-        default=None, ge=0, description="Сколько компания сейчас платит по другим кредитам в месяц, ₽", examples=[50_000]
+    amount: int | None = Field(default=None, gt=0, le=MAX_MONEY, description="Сумма кредита, ₽", examples=[2_000_000])
+    term_months: int | None = Field(default=None, gt=0, le=MAX_TERM, description="Срок, мес.", examples=[12])
+    revenue_12m: int | None = Field(
+        default=None, ge=0, le=MAX_MONEY, description="Выручка за последние 12 месяцев, ₽", examples=[30_000_000]
     )
-    employees: int | None = Field(default=None, ge=0, description="Число сотрудников", examples=[12])
+    revenue_prev_year: int | None = Field(
+        default=None, ge=0, le=MAX_MONEY, description="Выручка за предыдущие 12 месяцев, ₽", examples=[26_000_000]
+    )
+    monthly_debt_payments: int | None = Field(
+        default=None, ge=0, le=MAX_MONEY, description="Сколько компания сейчас платит по другим кредитам в месяц, ₽", examples=[50_000]
+    )
+    employees: int | None = Field(default=None, ge=0, le=1_000_000, description="Число сотрудников", examples=[12])
     collateral_description: str | None = Field(default=None, description="Что можно оставить в залог (для INVEST)")
     bki_consent: bool | None = Field(default=None, description="Согласие на запрос кредитной истории")
 

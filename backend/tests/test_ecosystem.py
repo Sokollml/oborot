@@ -93,6 +93,7 @@ def test_messages_between_client_and_analyst(client1, client2, analyst, db):
     assert client1.post(f"/api/applications/{app_id}/messages", json={"text": "Вопрос"}).status_code == 409  # черновик
     submit(client1, app_id)
 
+    assert client1.post(f"/api/applications/{app_id}/messages", json={"text": "   "}).status_code == 422  # пустое
     r = client1.post(f"/api/applications/{app_id}/messages", json={"text": "Нужна ли выписка?"})
     assert r.status_code == 200 and r.json()[0]["author_role"] == "client"
     assert db.scalar(select(Notification).where(Notification.user_id == 3, Notification.text.like("Клиент написал%")))

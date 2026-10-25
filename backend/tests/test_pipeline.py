@@ -125,6 +125,19 @@ def test_stopped_worker_resumes_from_current_status(client1):
     assert history == ["DRAFT", "SUBMITTED", "CHECKING", "SCORING", "OFFER"]  # без повторов
 
 
+def test_graceful_stop_is_not_a_failed_attempt(client1, db):
+    """Штатная остановка возвращает задачу без «сгоревшей» попытки — повторы при ошибках сохраняются."""
+    app_id = create_draft(client1)
+    submit(client1, app_id)
+    for _ in range(3):
+        job = queue.claim_job()
+        queue.release_job(job.id)
+    db.expire_all()
+    assert db.get(Job, job.id).attempts == 0
+    assert queue.claim_job().attempts == 1
+    assert queue.fail_job(job.id, "boom") is False  # первая настоящая ошибка — ещё не провал
+
+
 def test_heartbeat_extends_lease_every_stage(client1, db):
     """Живой воркер продлевает аренду перед каждым этапом — короткая аренда не приводит к перехвату задачи."""
     app_id = create_draft(client1)

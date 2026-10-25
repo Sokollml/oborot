@@ -128,3 +128,37 @@ def test_implausible_revenue_is_rejected_before_submit(client1):
     app_id = create_draft(client1, revenue_12m=23)
     r = submit(client1, app_id)
     assert r.status_code == 422 and "опечатку" in r.json()["detail"]
+
+
+def test_null_for_required_fields_does_not_break_draft(client1):
+    """null в обязательных полях черновика = «не менять», а не 500 от базы."""
+    app_id = create_draft(client1)
+    r = client1.patch(f"/api/applications/{app_id}", json={"purpose": None, "bki_consent": None, "amount": 1_000_000})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["purpose"] == "urgent" and body["bki_consent"] is True and body["amount"] == 1_000_000
+
+
+def test_too_big_numbers_are_human_422(client1):
+    """Опечатка с лишними нулями — понятная ошибка, а не 500 (переполнение колонки в базе)."""
+    app_id = create_draft(client1)
+    for field, value in [("term_months", 3_000_000_000), ("amount", 10**19), ("employees", 3_000_000_000)]:
+        r = client1.patch(f"/api/applications/{app_id}", json={field: value})
+        assert r.status_code == 422 and "Проверьте поля" in r.json()["detail"], (field, r.text)
+    # Номер заявки больше, чем помещается в колонку, — тоже не 500.
+    r = client1.get("/api/applications/99999999999")
+    assert r.status_code == 422 and "Проверьте" in r.json()["detail"]
+
+
+def test_inn_with_non_ascii_digits_is_human_422(client1):
+    r = client1.get("/api/companies/lookup", params={"inn": "²" * 10})  # str.isdigit() считает «²» цифрой
+    assert r.status_code == 422 and "10 цифр" in r.json()["detail"]
+
+
+def test_login_with_very_long_password_is_401():
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    r = TestClient(app).post("/api/auth/login", json={"email": "client1@demo.local", "password": "x" * 100})
+    assert r.status_code == 401  # bcrypt 5 не принимает > 72 байт — раньше это был 500

@@ -57,6 +57,7 @@ def queue(
         .outerjoin(last_scoring, last_scoring.c.application_id == Application.id)
         .outerjoin(Scoring, Scoring.id == last_scoring.c.id)
         .where(Application.status.in_([status] if status else VIEWS[view]))
+        .where(Application.status != AppStatus.DRAFT)  # черновики специалисту не видны и через фильтр status
         .order_by(entered.c.at.asc())  # дольше всех ждёт — сверху
     )
     if product:
