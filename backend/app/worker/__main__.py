@@ -47,6 +47,12 @@ def run_once() -> bool:
     if job is None:
         return False
     log.info("задача %s: заявка %s (попытка %s)", job.id, job.application_id, job.attempts)
+    if job.attempts > settings.job_max_attempts:
+        # Попыток больше лимита — значит, процесс воркера уже несколько раз умирал на этой задаче
+        # (не исключение, а падение целиком). Не крутим её бесконечно: отдаём заявку человеку.
+        queue.fail_job(job.id, "Воркер несколько раз останавливался на этой задаче")
+        _send_to_manual_review(job)
+        return True
     try:
         completed = process_application(
             job.application_id,

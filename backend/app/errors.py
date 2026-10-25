@@ -5,7 +5,7 @@
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import DataError
+from sqlalchemy.exc import DataError, IntegrityError
 
 
 class AppError(Exception):
@@ -40,6 +40,10 @@ class ValidationFailed(AppError):
     status_code = 422
 
 
+class TooManyRequests(AppError):
+    status_code = 429
+
+
 class ExternalUnavailable(AppError):
     status_code = 503
 
@@ -54,3 +58,9 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(DataError)
     def _handle_data_error(_request: Request, _exc: DataError) -> JSONResponse:
         return JSONResponse(status_code=422, content={"detail": "Проверьте введённые данные: значение вне допустимых границ"})
+
+    # Два одинаковых запроса пришли одновременно (двойной клик, повтор после обрыва сети) и второй
+    # упёрся в уникальность в базе. Это не сбой сервера: просим обновить страницу.
+    @app.exception_handler(IntegrityError)
+    def _handle_integrity_error(_request: Request, _exc: IntegrityError) -> JSONResponse:
+        return JSONResponse(status_code=409, content={"detail": "Запрос уже обработан. Обновите страницу"})

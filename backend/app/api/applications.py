@@ -18,6 +18,7 @@ from app.enums import ActorType, AppStatus, CheckSource, JobStatus, JobType
 from app.errors import Conflict, NotFound, ValidationFailed
 from app.models import Application, Company, Job, Product, StatusHistory
 from app.schemas import (
+    AcceptIn,
     ApplicationCreate,
     ApplicationListItem,
     ApplicationOut,
@@ -26,7 +27,7 @@ from app.schemas import (
     SignIn,
 )
 from app.services.state_machine import STATUS_LABELS, Actor, transition
-from app.views import application_list_item, application_out
+from app.views import application_list_item, application_out, latest_decision
 
 router = APIRouter(tags=["Заявки клиента"])
 
@@ -250,7 +251,9 @@ def get_history(application_id: int, db: DB, user: ClientUser) -> list[HistoryIt
             to_status=r.to_status,
             to_label=STATUS_LABELS[AppStatus(r.to_status)],
             actor_type=r.actor_type,
-            comment=r.comment,
+            # При отказе у специалиста два текста: внутренний комментарий и причина для клиента
+            # (она в решении). Внутренний комментарий клиенту не показываем.
+            comment=None if r.actor_type == ActorType.ANALYST and r.to_status == AppStatus.REJECTED else r.comment,
             created_at=r.created_at,
         )
         for r in rows
@@ -271,8 +274,14 @@ def cancel_application(application_id: int, db: DB, user: ClientUser) -> Applica
 
 
 @router.post("/applications/{application_id}/offer/accept", response_model=ApplicationOut, summary="Принять предложение")
-def accept_offer(application_id: int, db: DB, user: ClientUser) -> ApplicationOut:
+def accept_offer(application_id: int, db: DB, user: ClientUser, body: AcceptIn | None = None) -> ApplicationOut:
     app = get_owned_application(db, application_id, user, for_update=True)
+    # Специалист может поменять условия, пока клиент на них смотрит: принимаем только то предложение,
+    # которое клиент видел. Заявка заблокирована (FOR UPDATE), поэтому проверка и переход атомарны.
+    if body and body.decision_id is not None and app.status == AppStatus.OFFER:
+        current = latest_decision(db, app.id)
+        if current is None or current.id != body.decision_id:
+            raise Conflict("Условия предложения только что изменились. Посмотрите новые условия и примите их ещё раз")
     transition(db, app, AppStatus.SIGNING, Actor.of(user), comment="Клиент принял предложение")
     # Симуляция подписи: код генерируется здесь и показывается клиенту на экране (никаких SMS).
     app.signing_code = f"{secrets.randbelow(1_000_000):06d}"

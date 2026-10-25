@@ -33,6 +33,7 @@ ALLOWED_TRANSITIONS: dict[tuple[AppStatus, AppStatus], set[ActorType]] = {
     (S.DRAFT, S.CANCELLED): {A.CLIENT},
     # Конвейер (воркер)
     (S.SUBMITTED, S.CHECKING): {A.SYSTEM},
+    (S.SUBMITTED, S.MANUAL_REVIEW): {A.SYSTEM},  # обработка сорвалась на первом этапе — отдаём человеку
     (S.CHECKING, S.SCORING): {A.SYSTEM},
     (S.CHECKING, S.MANUAL_REVIEW): {A.SYSTEM},  # внешний сервис не ответил после всех попыток
     (S.SCORING, S.OFFER): {A.SYSTEM},

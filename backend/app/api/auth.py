@@ -1,12 +1,15 @@
 """Вход и выход. Токен хранится в httpOnly-cookie — JavaScript страницы его не видит."""
 
+import time
+from collections import defaultdict, deque
+
 from fastapi import APIRouter, Response
 from sqlalchemy import select
 
 from app.config import settings
 from app.deps import DB, CurrentUser
 from app.enums import Role
-from app.errors import NotAuthenticated
+from app.errors import NotAuthenticated, TooManyRequests
 from app.models import User
 from app.schemas import DemoAccount, LoginIn, MetaOut, UserOut
 from app.security import COOKIE_NAME, create_token, verify_password
@@ -20,11 +23,32 @@ DEMO_ACCOUNTS = [
 ]
 
 
+# Защита от подбора пароля: после LOGIN_MAX_FAILURES неудачных попыток за LOGIN_WINDOW_SECONDS
+# вход для этого email временно закрыт. Счётчик в памяти процесса — для одного экземпляра API этого
+# достаточно; при нескольких экземплярах его нужно вынести в общую базу.
+LOGIN_MAX_FAILURES = 10
+LOGIN_WINDOW_SECONDS = 300
+_failures: dict[str, deque[float]] = defaultdict(deque)
+
+
+def _recent_failures(email: str) -> deque[float]:
+    attempts = _failures[email]
+    while attempts and attempts[0] < time.monotonic() - LOGIN_WINDOW_SECONDS:
+        attempts.popleft()
+    return attempts
+
+
 @router.post("/auth/login", response_model=UserOut, summary="Войти по email и паролю")
 def login(body: LoginIn, response: Response, db: DB) -> User:
-    user = db.scalar(select(User).where(User.email == body.email.strip().lower()))
+    email = body.email.strip().lower()
+    failures = _recent_failures(email)
+    if len(failures) >= LOGIN_MAX_FAILURES:
+        raise TooManyRequests("Слишком много неудачных попыток входа. Подождите 5 минут и попробуйте снова")
+    user = db.scalar(select(User).where(User.email == email))
     if user is None or not verify_password(body.password, user.password_hash):
+        failures.append(time.monotonic())
         raise NotAuthenticated("Неверный email или пароль")
+    _failures.pop(email, None)
     response.set_cookie(
         COOKIE_NAME,
         create_token(user.id, user.role),

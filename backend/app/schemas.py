@@ -156,6 +156,7 @@ class NextActionOut(BaseModel):
 
 
 class DecisionOut(ORM):
+    id: int = Field(description="Номер версии решения: меняется, когда специалист меняет условия", examples=[7])
     type: str = Field(description="approve — одобрено, counter — контрпредложение, info — нужны документы, reject — отказ")
     amount: int | None = None
     term: int | None = None
@@ -221,6 +222,14 @@ class HistoryItem(ORM):
     actor_type: ActorType
     comment: str | None
     created_at: datetime
+
+
+class AcceptIn(BaseModel):
+    decision_id: int | None = Field(
+        default=None,
+        description="Какое предложение клиент видел на экране (decision.id). Если специалист успел изменить условия — 409",
+        examples=[7],
+    )
 
 
 class SignIn(BaseModel):

@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Query
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.deps import DB, ClientUser
@@ -43,8 +44,13 @@ def get_or_create_company(db: Session, user: User, inn: str) -> Company:
         status=info.status,
         director=info.director,
     )
-    db.add(company)
-    db.flush()
+    # Два одновременных запроса с одним ИНН: второй упрётся в уникальность (владелец, ИНН).
+    # Savepoint откатывает только эту вставку — берём компанию, которую успел создать первый.
+    try:
+        with db.begin_nested():
+            db.add(company)
+    except IntegrityError:
+        company = db.scalar(select(Company).where(Company.owner_user_id == user.id, Company.inn == inn))
     return company
 
 

@@ -1004,6 +1004,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/AcceptIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1974,6 +1991,27 @@
   },
   "components": {
     "schemas": {
+      "AcceptIn": {
+        "properties": {
+          "decision_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Id",
+            "description": "Какое предложение клиент видел на экране (decision.id). Если специалист успел изменить условия — 409",
+            "examples": [
+              7
+            ]
+          }
+        },
+        "type": "object",
+        "title": "AcceptIn"
+      },
       "ActorType": {
         "type": "string",
         "enum": [
@@ -2844,6 +2882,14 @@
       },
       "DecisionOut": {
         "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id",
+            "description": "Номер версии решения: меняется, когда специалист меняет условия",
+            "examples": [
+              7
+            ]
+          },
           "type": {
             "type": "string",
             "title": "Type",
@@ -2923,6 +2969,7 @@
         },
         "type": "object",
         "required": [
+          "id",
           "type",
           "reasons",
           "advice",
