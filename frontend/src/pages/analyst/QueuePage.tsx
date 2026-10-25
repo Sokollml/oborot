@@ -7,7 +7,7 @@ import { useAnalystQueue, useProducts, type QueueView } from '../../api/queries'
 import { EmptyState, ErrorState, Loading } from '../../components/StateViews';
 import { StatusBadge } from '../../components/StatusBadge';
 import { clickable } from '../../lib/a11y';
-import { months, rub, waiting } from '../../lib/format';
+import { months, rub, waiting, waitingLevel } from '../../lib/format';
 import { Term } from '../../lib/glossary';
 import { useIsMobile } from '../../lib/responsive';
 import { RISK_COLOR } from '../../lib/statuses';
@@ -97,9 +97,7 @@ export function QueuePage() {
               </Text>
               <Group justify="space-between" mt="xs">
                 <StatusBadge status={q.status} label={q.status_label} />
-                <Text size="xs" c="dimmed">
-                  ждёт {waiting(q.waiting_since)}
-                </Text>
+                <Waiting since={q.waiting_since} size="xs" prefix="ждёт " onMe={q.status === 'MANUAL_REVIEW'} />
               </Group>
             </Paper>
           ))}
@@ -145,7 +143,7 @@ export function QueuePage() {
                     <StatusBadge status={q.status} label={q.status_label} />
                   </Table.Td>
                   <Table.Td>
-                    <Text size="sm">{waiting(q.waiting_since)}</Text>
+                    <Waiting since={q.waiting_since} size="sm" onMe={q.status === 'MANUAL_REVIEW'} />
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -154,5 +152,25 @@ export function QueuePage() {
         </Paper>
       )}
     </Stack>
+  );
+}
+
+/**
+ * Сколько ждёт заявка. Если ждёт решения специалиста (onMe): дольше 4 часов — оранжевым,
+ * дольше суток (обещание клиенту нарушено) — красным. Ожидание ответа клиента не подсвечиваем.
+ */
+function Waiting({ since, size, prefix = '', onMe }: { since: string; size: 'xs' | 'sm'; prefix?: string; onMe: boolean }) {
+  const level = onMe ? waitingLevel(since) : 'ok';
+  const text = (
+    <Text size={size} c={level === 'late' ? 'red.7' : level === 'soon' ? 'orange.8' : 'dimmed'} fw={level === 'ok' ? undefined : 700}>
+      {prefix}
+      {waiting(since)}
+    </Text>
+  );
+  if (level === 'ok') return text;
+  return (
+    <Tooltip label={level === 'late' ? 'Клиенту обещали решение в течение рабочего дня — срок вышел' : 'Ждёт дольше 4 часов — стоит взять в работу'}>
+      {text}
+    </Tooltip>
   );
 }

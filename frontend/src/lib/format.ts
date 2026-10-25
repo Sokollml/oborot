@@ -64,6 +64,15 @@ export function annuity(amount: number, annualRatePct: number, termMonths: numbe
 }
 
 /** Сколько ждёт: «5 мин», «2 ч», «3 дн». */
+/**
+ * Насколько срочно: клиенту обещано решение специалиста в течение рабочего дня (см. next_action на бэкенде).
+ * После 4 часов — пора браться, после суток — обещание нарушено.
+ */
+export function waitingLevel(sinceIso: string): 'ok' | 'soon' | 'late' {
+  const h = (Date.now() - new Date(sinceIso).getTime()) / 3_600_000;
+  return h >= 24 ? 'late' : h >= 4 ? 'soon' : 'ok';
+}
+
 export function waiting(sinceIso: string): string {
   const s = Math.max(0, (Date.now() - new Date(sinceIso).getTime()) / 1000);
   if (s < 60) return 'меньше минуты';
